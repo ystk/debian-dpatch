@@ -1,0 +1,77 @@
+## dpatch_patchset.shpp				-*- shell-script -*-
+##
+## Patchset handling functions for dpatch.
+##
+
+# dpatch_pathset_do <command> <issingle> [<dpatchfile>]
+dpatch_patchset_do ()
+{
+	local patchlist patchlist_all patchlist_arch patch cpatch cmd args
+	local is_single
+	DEB_BUILD_ARCH=${DEB_BUILD_ARCH:-$(dpkg-architecture -qDEB_BUILD_ARCH)}
+
+	cmd=$1; shift || true
+	is_single=$1; shift || true
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				dpatch_help_do ${cmd}
+				return $?
+				;;
+			-*)
+				args="${args} $1"
+				;;
+			*)
+				break
+				;;
+		esac
+		shift || true
+	done
+	patch="${1%%.dpatch}";
+	if [ $# -ne 0 ]; then
+		shift || true
+	fi
+
+	if test $# -gt 0 || test $is_single -eq 1; then
+		patchlist="$patch $@"
+		patch=""
+	else
+		if [ "${DPATCH_OPTION_CPP}" = "0" ]; then
+			if test -f debian/patches/00list; then
+				patchlist_all="$(grep -v ^\# debian/patches/00list || :)"
+			fi
+			if test -f debian/patches/00list.${DEB_BUILD_ARCH}; then
+				patchlist_arch="$(grep -v ^\# debian/patches/00list.${DEB_BUILD_ARCH} || :)"
+			fi
+		else
+			if [ -f debian/patches/00list ]; then
+				patchlist_all="$(cpp -P -DDEB_BUILD_ARCH_${DEB_BUILD_ARCH}=1 \
+						        -DDEB_BUILD_ARCH=\"${DEB_BUILD_ARCH}\" \
+						        debian/patches/00list || :)"
+			fi
+			if [ -f debian/patches/00list.${DEB_BUILD_ARCH} ]; then
+				patchlist_arch="$(cpp -P -DDEB_BUILD_ARCH_${DEB_BUILD_ARCH}=1 \
+							 -DDEB_BUILD_ARCH=\"${DEB_BUILD_ARCH}\" \
+							 debian/patches/00list.${DEB_BUILD_ARCH} || :)"
+			fi
+		fi
+		patchlist="${patchlist_all} ${patchlist_arch}"
+	fi
+
+	if test "x$cmd" = "xdeapply"; then
+		patchlist=$(echo ${patchlist} | tr ' ' '\n' | tac)
+	fi
+
+	for cpatch in ${patchlist}; do
+		cpatch="${cpatch%%.dpatch}"
+		dpatch_patch_${cmd} "${args}" "${cpatch}"
+		if test $? -ne 0; then
+			return $?
+		fi
+		if test "x${cpatch}" = "x${patch}"; then
+			return 0
+		fi
+	done
+}
+
+## arch-tag: 8ce6157c-c059-48f1-aa5c-a0a217596f66

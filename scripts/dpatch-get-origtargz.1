@@ -1,0 +1,49 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH DPATCH-GET-ORIGTARGZ 1 "January 25, 2005" DPATCH
+.SH NAME
+dpatch-get-origtargz \- Obtain upstream tarball
+.SH SYNOPSIS
+.B dpatch\-get\-origtargz
+.RI <origtardir>
+.SH DESCRIPTION
+This manual page documents briefly the
+.B dpatch\-get\-origtargz
+command which verifies whether there is a upstream tarball for the
+current work directory's source package in the directory pointed to by
+<origtardir>.
+.B dpatch\-get\-origtargz
+will try to find the upstream tarball using one of the following
+methods:
+.br
+1) in the directory pointed to by the \fBDPGO_ORIGTARDIR\fR environment variable,
+.br
+2) in all directories listed in the \fBDPGO_ORIGTARGZPATH\fR environment
+variable (colon-separated list of directories),
+.br
+3) in the parent directory of the current work directory,
+.br
+4) on the Debian mirror configured into apt, and
+.br
+5) on the Internet, using the first URL found in debian/watch.
+.br
+
+If not, it tries to obtain the upstream tarball from a
+number of possible sources: The parent directory, the apt
+repository configured, and finally, the internet server
+pointed to by debian/watch.
+
+.SH "SEE ALSO"
+.BR "dpatch" "(1), "
+.BR "dpatch" "(7), "
+.BR "dpatch.make" "(7), "
+.BR "dpatch\-edit\-patch" "(1), "
+.BR "dpatch\-list\-patch" "(1), "
+.BR "dpatch\-convert\-diffgz" "(1)"
+
+.RI "Files in " "/usr/share/doc/dpatch/"
+.SH AUTHOR
+dpatch\-get\-origtargz and this manual page was written by Marc Haber
+<mh+debian\-packages@zugschlus.de> and modified by Stefano Zacchiroli
+<zack@debian.org>.
+
+.\" arch-tag: a8bdf178-9016-4721-a6b0-e5d492df89b7

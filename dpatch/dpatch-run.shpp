@@ -1,0 +1,10 @@
+## dpatch-run.shpp		-*- shell-script -*-
+##
+## A she-bang wrapper around dpatch.lib.sh.
+##
+
+set -e
+
+. /usr/share/dpatch/dpatch.lib.sh
+
+# arch-tag: f5c653d2-3a79-47e1-9163-aea36d2debdf

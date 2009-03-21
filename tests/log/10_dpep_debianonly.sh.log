@@ -1,0 +1,55 @@
+   Check that --debianonly option is working in dpatch-edit-patch
+   Also try checking that given a wrong full path, it will error out.; 
+   message fixed in 317758
+
++ cd /tmp/XXXX/dpatch-test/..
++ mkdir debianonly
++ mkdir debianonly/upstream
++ mkdir debianonly/dpatch-test
++ cp -r /tmp/XXXX/dpatch-test/debian debianonly/dpatch-test
++ tar cfz debianonly/upstream/dpatch-test_0.1.orig.tar.gz dpatch-test
++ cd debianonly/dpatch-test
++ echo 'echo another-patch > 10 '
++ dpatch-edit-patch --debianonly=../upstream/dpatch-test_0.1.orig.tar.gz -d test 10_test_patch
+dpatch-edit-patch: * /tmp/XXXX/debianonly/dpatch-test/debian/patches/10_test_patch.dpatch does not exist, it will be created as a new dpatch.
+dpatch-edit-patch: * debian/-only layout selected
+dpatch-edit-patch: * unpacking /tmp/XXXX/debianonly/upstream/dpatch-test_0.1.orig.tar.gz
+dpatch-edit-patch: * Copying /tmp/XXXX/debianonly/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+dpatch-edit-patch: Warning: * No base-patch supplied, not applying any patches.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: * Creating new patch /tmp/XXXX/debianonly/dpatch-test/debian/patches/10_test_patch.dpatch
+dpatch-edit-patch: Warning: debian/patches/00template not exist, using hardcoded default.
+dpatch-edit-patch: /tmp/XXXX/debianonly/dpatch-test/debian/patches/10_test_patch.dpatch created.
++ echo 'echo even more > 10 '
++ dpatch-edit-patch --debianonly=../upstream/dpatch-test_0.1.orig.tar.gz- -d test 10_test_patch
+dpatch-edit-patch: * /tmp/XXXX/debianonly/dpatch-test/debian/patches/10_test_patch.dpatch exists, this patch will be updated.
+dpatch-edit-patch: * debian/-only layout selected
+dpatch-edit-patch: Error: ../upstream/dpatch-test_0.1.orig.tar.gz-, given on command line, does not exist
++ echo success
+success
++ grep another-patch debian/patches/10_test_patch.dpatch
++another-patch

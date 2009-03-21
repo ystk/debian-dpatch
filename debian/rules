@@ -1,0 +1,67 @@
+#!/usr/bin/make -f
+# Gergely loves debhelper less - lets do it without debhelper then :)
+
+DPATCH		= ${CURDIR}/debian/dpatch
+MAN1DIR		= ${DPATCH}/usr/share/man/man1
+MAN7DIR		= ${DPATCH}/usr/share/man/man7
+DOCDIR		= ${DPATCH}/usr/share/doc/dpatch
+EXDIR		= ${DOCDIR}/examples
+
+DOCS		= README.History README.git README.source
+
+build:
+	test -e debian/control
+	${MAKE}
+
+testroot:
+	test -e debian/control && test xroot = x`whoami`
+
+clean: testroot
+	${MAKE} clean
+	rm -rf debian/files* ${DPATCH}
+
+# General compresser rule
+${DOCDIR}/%.gz: %
+	gzip -9fc $< >$@
+
+# Install directories
+installdirs:
+	install -d ${DPATCH}/usr/bin \
+		   ${DPATCH}/DEBIAN \
+		   ${EXDIR} ${MAN1DIR} ${MAN7DIR} \
+		   ${DPATCH}/etc/bash_completion.d
+
+# Install everything, save DEBIAN/ and stuff from debian/
+install: build installdirs \
+	 $(addsuffix .gz,$(addprefix ${DOCDIR}/,${DOCS}))
+# dpatch itself
+	${MAKE} install DESTDIR=${DPATCH}
+# history
+	cp -r history ${DOCDIR}/
+# Compress stuff
+	find ${MAN1DIR} -type f -not -name '*.gz' | xargs gzip -9f
+	find ${MAN7DIR} -type f -not -name '*.gz' | xargs gzip -9f
+	find ${EXDIR} -type f -not -name '*.gz' | xargs gzip -9f
+	find ${DOCDIR}/history -type d -name '.arch-ids' | xargs rm -rf
+	find ${DOCDIR}/history -type f -not -name '*.gz' | xargs gzip -9f
+
+# Install the whole thing, including DEBIAN/ and stuff from debian/
+binary-dpatch: testroot install
+	gzip -9fc debian/NEWS >${DOCDIR}/NEWS.Debian.gz
+	gzip -9fc debian/changelog >${DOCDIR}/changelog.gz
+	install -m 0644 debian/copyright ${DOCDIR}/copyright
+	cd ${DPATCH} >/dev/null ;\
+	  find etc -type f -printf "/%p\n" >DEBIAN/conffiles
+	cd ${DPATCH} >/dev/null; \
+	  find * -type f ! -regex '^DEBIAN/.*' -print0 | \
+		xargs -r0 md5sum > DEBIAN/md5sums
+	dpkg-gencontrol -isp -P${DPATCH}
+	dpkg --build ${DPATCH} ..
+
+binary-indep: binary-dpatch
+binary-arch: ;
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary installdirs install \
+	binary-dpatch testroot
+
+# arch-tag: bb474018-43b6-4bc2-91bc-6d0129cd7639

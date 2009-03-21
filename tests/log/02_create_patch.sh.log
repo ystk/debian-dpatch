@@ -1,0 +1,182 @@
+   check generation of initial patch
+   Bug#321320: also check the generated patch file
+
+dpatch-edit-patch: * /tmp/XXXX/dpatch-test/debian/patches/01_edpatch.dpatch does not exist, it will be created as a new dpatch.
+dpatch-edit-patch: * Copying /tmp/XXXX/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+dpatch-edit-patch: Warning: * No base-patch supplied, not applying any patches.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: * Creating new patch /tmp/XXXX/dpatch-test/debian/patches/01_edpatch.dpatch
+dpatch-edit-patch: Warning: debian/patches/00template not exist, using hardcoded default.
+dpatch-edit-patch: /tmp/XXXX/dpatch-test/debian/patches/01_edpatch.dpatch created.
+dpatch apply-all
+applying patch 01_edpatch to ./ ... ok.
+dpatch cat-all >patch-stamp
+touch patch-stamp
+=== check file one1 contains the right content
+dpatch deapply-all
+reverting patch 01_edpatch from ./ ... ok.
+rm -rf patch-stamp debian/patched
+=== check file one1 does not exist
+dpatch-edit-patch: * /tmp/XXXX/dpatch-test/debian/patches/02_create_two.dpatch does not exist, it will be created as a new dpatch.
+dpatch-edit-patch: * Copying /tmp/XXXX/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+01_edpatch not applied to ./ .
+dpatch-edit-patch: Warning: * No base-patch supplied, not applying any patches.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: * Creating new patch /tmp/XXXX/dpatch-test/debian/patches/02_create_two.dpatch
+dpatch-edit-patch: Warning: debian/patches/00template not exist, using hardcoded default.
+dpatch-edit-patch: /tmp/XXXX/dpatch-test/debian/patches/02_create_two.dpatch created.
+dpatch-edit-patch: * /tmp/XXXX/dpatch-test/debian/patches/02_create_two.dpatch exists, this patch will be updated.
+dpatch-edit-patch: * Copying /tmp/XXXX/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+01_edpatch not applied to ./ .
+dpatch-edit-patch: Warning: 02_create_two.dpatch is not listed in debian/patches/00list, no other patches will be applied to the working directory.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+dpatch-edit-patch: * Applying current 02_create_two.dpatch for editing.
+applying patch 02_create_two to ./ ... ok.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: Updating patch /tmp/XXXX/dpatch-test/debian/patches/02_create_two.dpatch
+dpatch-edit-patch: @DPATCH@ tag found, preserving dpatch header.
+dpatch-edit-patch: /tmp/XXXX/dpatch-test/debian/patches/02_create_two.dpatch updated.
+diff gives zero output; date should have changed
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 02_create_two.dpatch by Junichi Uekawa <dancer@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+@DPATCH@
+diff -urNad dpatch-test~/02_create_patch.sh dpatch-test/02_create_patch.sh
+--- dpatch-test~/02_create_patch.sh	1970-01-01 09:00:00.000000000 +0900
++++ dpatch-test/02_create_patch.sh	2007-06-16 23:25:24.000000000 +0900
+@@ -0,0 +1,33 @@
++#!/bin/bash
++##: check generation of initial patch
++##: Bug#321320: also check the generated patch file
++# Junichi Uekawa 19 June 2005, updated 6 Aug 2005.
++set -e
++
++cd $PKGPATH
++
++echo 'echo this-is-a-line > one1 ' | dpatch-edit-patch 01_edpatch
++echo 01_edpatch > debian/patches/00list
++debian/rules patch
++
++echo '=== check file one1 contains the right content'
++[ `cat one1` = this-is-a-line ]
++debian/rules unpatch
++
++echo '=== check file one1 does not exist'
++[ ! -f one1 ]
++
++# additional checks; try creating a patch file.
++echo "cp -p ${SOURCE_DIR}/02_create_patch.sh . " | dpatch-edit-patch 02_create_two
++cp debian/patches/02_create_two.dpatch{,~~}
++echo "exit 0" | dpatch-edit-patch 02_create_two
++
++# 'patch' will update the timestamp. The following command 
++# should output '11', not 0.
++
++if diff -u debian/patches/02_create_two.dpatch{~~,} > /dev/null; then
++    :
++else
++    echo 'diff gives zero output; date should have changed'
++    cat  debian/patches/02_create_two.dpatch{~~,}
++fi
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## 02_create_two.dpatch by Junichi Uekawa <dancer@debian.org>
+##
+## All lines beginning with `## DP:' are a description of the patch.
+## DP: No description.
+
+@DPATCH@
+diff -urNad dpatch-test~/02_create_patch.sh dpatch-test/02_create_patch.sh
+--- dpatch-test~/02_create_patch.sh	1970-01-01 09:00:00.000000000 +0900
++++ dpatch-test/02_create_patch.sh	2008-08-10 04:22:13.052314817 +0900
+@@ -0,0 +1,33 @@
++#!/bin/bash
++##: check generation of initial patch
++##: Bug#321320: also check the generated patch file
++# Junichi Uekawa 19 June 2005, updated 6 Aug 2005.
++set -e
++
++cd $PKGPATH
++
++echo 'echo this-is-a-line > one1 ' | dpatch-edit-patch 01_edpatch
++echo 01_edpatch > debian/patches/00list
++debian/rules patch
++
++echo '=== check file one1 contains the right content'
++[ `cat one1` = this-is-a-line ]
++debian/rules unpatch
++
++echo '=== check file one1 does not exist'
++[ ! -f one1 ]
++
++# additional checks; try creating a patch file.
++echo "cp -p ${SOURCE_DIR}/02_create_patch.sh . " | dpatch-edit-patch 02_create_two
++cp debian/patches/02_create_two.dpatch{,~~}
++echo "exit 0" | dpatch-edit-patch 02_create_two
++
++# 'patch' will update the timestamp. The following command 
++# should output '11', not 0.
++
++if diff -u debian/patches/02_create_two.dpatch{~~,} > /dev/null; then
++    :
++else
++    echo 'diff gives zero output; date should have changed'
++    cat  debian/patches/02_create_two.dpatch{~~,}
++fi

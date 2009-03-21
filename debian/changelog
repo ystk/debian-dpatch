@@ -1,0 +1,749 @@
+dpatch (2.0.31) unstable; urgency=low
+
+  * fix: /usr/share/dpatch/dpatch-edit-patch.functions: line 140: shifti:
+    command not found (closes: #498609), thanks to Daniel Leidert
+  * remove Gergely Nagy and Joerg Jaspert from Uploaders field; they
+    haven't uploaded in five years. (closes: #519349)
+
+ -- Junichi Uekawa <dancer@debian.org>  Sat, 21 Mar 2009 23:29:38 +0900
+
+dpatch (2.0.30) unstable; urgency=low
+
+  * add README.source, thanks to Gerfried Fuchs <rhonda@debian.at> 
+    (closes: #491092)
+  * debian/control: standards-version 3.8.0
+  * Bug fix: "dpatch: --desc vs. --desc-only", thanks to gregor herrmann
+    (Closes: #470155).
+  * depend on bash => 3.0-6 for pipefail
+
+ -- Junichi Uekawa <dancer@debian.org>  Sun, 10 Aug 2008 23:46:17 +0900
+
+dpatch (2.0.29) unstable; urgency=low
+
+  * add Vcs-Git and Vcs-Browser tags.
+  * Using the -a -0 options twice to the same patch makes it overridden
+    (Closes: #452702)
+
+ -- Junichi Uekawa <dancer@debian.org>  Sat, 26 Jan 2008 11:44:34 +0900
+
+dpatch (2.0.28) unstable; urgency=low
+
+  * Bug fix: "dpatch: manpage refers to DPGO_ORIGTARPATH but real variable
+    is DPGO_ORIGTARGZPATH", thanks to Sylvain Le Gall (Closes: #444231).
+  * Bug fix: "d-e-p: cmdline flag to automatically append new patch name
+    to 00list", thanks to Sandro Tosi (Closes: #316588).
+  * Bug fix: "/usr/bin/dpatch-edit-patch: d-e-p: cmdline flag for applying
+    all patches when creating new patch", thanks to Sandro Tosi (Closes:
+    #316587).
+  * Bug fix: "Fix hyphens in man page and update FSF address in
+    copyright.", thanks to Kumar Appaiah (Closes: #446049).
+  * Bug fix: "dpatch: fails when $HOME contains spaces", thanks to Martin
+    Koeppe (Closes: #440044).
+  * Bug fix: "dpatch-edit-patch: when tarball retrieve fails, error msg is
+    incomplete", thanks to Kurt B. Kaiser (Closes: #443140).
+  * Bug fix: "dpatch-get-origtargz: doesn't use canonical tarball name
+    for retrieved file", thanks to Kurt B. Kaiser (Closes: #443144).
+
+ -- Junichi Uekawa <dancer@debian.org>  Sun, 28 Oct 2007 13:47:55 +0900
+
+dpatch (2.0.27) unstable; urgency=low
+
+  * Bug fix: "dpatch: [patch] README.git - wording fixes", thanks to Jari
+    Aalto (Closes: #435790).
+  * Apply patch: "dpatch-edit-patch --debianonly=PATH tries to unpack PATH",
+    thanks to Daniel Leidert (Closes: #426423).
+
+ -- Junichi Uekawa <dancer@debian.org>  Fri, 03 Aug 2007 21:28:59 +0900
+
+dpatch (2.0.26) unstable; urgency=low
+
+  * Bug fix: "Stray 'q' in dpatch-edit-patch.functions breaks --shell (-l)
+    argument to dpatch-edit-patch", thanks to Paul TBBle Hampson (Closes:
+    #429051).
+  * README.arch -> README.git: update contents to match current status
+    quo.
+  * dpatch.make.7: document patch-stamp usage, and update manpage example
+    from the rules file snippet from samples/ directory.
+  - Bug fix: "Undocumented sideeffect of forcing build to run", thanks to
+    Marcin Owsiany (Closes: #429723).
+  * Bug fix: "Cowdancer support for dpatch-edit-patch", thanks to Paul
+    TBBle Hampson (Closes: #429048).
+  - add dpatch-cowdancer-patch command for running dpatch-edit-patch with
+    cowdancer.
+
+ -- Junichi Uekawa <dancer@debian.org>  Mon, 25 Jun 2007 21:19:59 +0900
+
+dpatch (2.0.25) unstable; urgency=low
+
+  * specify dpatch command to use bash, to use 'set -o pipefail', for
+    users who are using dash as their /bin/sh.
+     (Closes: #425966).
+
+ -- Junichi Uekawa <dancer@debian.org>  Sun, 27 May 2007 02:59:06 +0900
+
+dpatch (2.0.23) unstable; urgency=low
+
+  * Bug fix: "dpatch: option -v causes errors to be ignored", thanks to
+    Peter Eisentraut (Closes: #396738).
+
+ -- Junichi Uekawa <dancer@debian.org>  Sun, 20 May 2007 08:27:35 +0900
+
+dpatch (2.0.22) unstable; urgency=low
+
+  * dpatch-edit-patch: default ignore directory was "CVS .svn", it is now 
+    "CVS .svn .git .arch .hg _darcs .bzr"
+  * add pbuilder-test.
+  * Bump Standards-Version to 3.7.2
+
+ -- Junichi Uekawa <dancer@debian.org>  Tue,  8 May 2007 02:02:24 +0900
+
+dpatch (2.0.21) unstable; urgency=low
+
+  * Bug fix: "dpatch: wrong example in manpage", thanks to Loic Le Guyader
+    (Closes: #398452).
+    The sample file was already fixed, but the manpage had the wrong version.
+  * Bug fix: "Make dpatch-edit-patch updated patch to have a permission
+    from umask, not 711", thanks to Daniel Leidert (Closes: #398495).
+
+ -- Junichi Uekawa <dancer@debian.org>  Wed, 15 Nov 2006 21:31:35 +0900
+
+dpatch (2.0.20) unstable; urgency=low
+
+  [Junichi Uekawa]
+  * dpatch-edit-patch, dpatch-get-origtargz: support epoch (Closes: #368250).
+  * Bug fix: "possible issues with
+    /usr/share/doc/dpatch/examples/rules/rules.new.dh.gz", thanks to Marc
+    Haber (Closes: #357820).
+
+ -- Junichi Uekawa <dancer@debian.org>  Fri,  2 Jun 2006 23:19:56 +0900
+
+dpatch (2.0.19) unstable; urgency=low
+
+  [Junichi Uekawa]
+  * Fix spelling mistake in manual pages (Closes: #357440).
+  * Bug fix: "dpatch: [manual] Missing SEE ALSO dpatch-list-patch(1)",
+    thanks to Jari Aalto (Closes: #352424).
+
+ -- Junichi Uekawa <dancer@debian.org>  Sat, 25 Mar 2006 14:44:03 +0900
+
+dpatch (2.0.18) unstable; urgency=low
+
+  * Bug fix: "dpatch-convert-diffgz creates inconsistant 00list", thanks
+    to Charles Fry (Closes: #328400).
+    Remove document that refers to '01-patchname.dpatch' as the format for 
+    00list file (dpatch.1), and update to document the real practice.
+  * Bug fix: "dpatch-edit-patch produces locale-dependent patch output",
+    thanks to Peter Eisentraut (Closes: #341103).
+  * fix obvious typo, list-up-tp -> list-up-to
+
+ -- Junichi Uekawa <dancer@debian.org>  Sat, 11 Feb 2006 23:33:32 +0900
+
+dpatch (2.0.17) unstable; urgency=low
+
+  * Fix a bug where dpatch-edit-patch writes a garbage filename when
+    @DPATCH@ is not there on editing a patch.
+  - tests/14_dpatch_edit_patch_without_DPATCH.sh
+  * Bug fix: "dpatch-get-origtargz: bug when origtgz is a symlink", thanks
+    to Enrico Tassi (Closes: #344691).
+
+ -- Junichi Uekawa <dancer@debian.org>  Sat, 28 Jan 2006 08:21:15 +0900
+
+dpatch (2.0.16) unstable; urgency=low
+
+  * Bug fix: "dpatch: manpage typo: s/ th / the /", thanks to Justin
+    Pryzby (Closes: #337160).
+  * Bug fix: "dpatch suggests wrong cpp build dependency", thanks to
+    Matthias Klose (Closes: #333005).
+  * Bug fix: "examples/rules/rules.new.non-dh.gz uses undocumented
+    --with-cpp option", thanks to Matthias Klose (Closes: #333006).
+  * Bug fix: "dpatch-edit-patch should fail when no patchname specified",
+    thanks to Charles Fry (Closes: #328731).
+
+ -- Junichi Uekawa <dancer@debian.org>  Fri, 16 Dec 2005 08:16:54 +0900
+
+dpatch (2.0.15) unstable; urgency=low
+
+  * Bug fix: "dpatch: prettier diff -u headers", thanks to Peter Samuelson
+    (Closes: #321320).
+    - update testsuites. (dancerj)
+  * Man page SEE ALSO update (dancerj)
+    - dpatch-edit-patch.1 (closes: #320664)
+    - dpatch-list-patch.1
+    - dpatch-get-origtargz.1
+    - dpatch-convert-diffgz.1
+  * Remove reference to README file which is no longer there
+    - dpatch-edit-patch.1 (closes: #328288)
+    - dpatch-list-patch.1
+
+ -- Junichi Uekawa <dancer@debian.org>  Sun, 18 Sep 2005 07:29:05 +0900
+
+dpatch (2.0.14) unstable; urgency=low
+
+  * Fix typo in dpatch.7 manpage. Thanks to A Costa. (mh) Closes: #312427
+  * Fix more typos. (mh)
+  * Fix dpatch-get-origtargz which had the apt-get source return code
+    reversed. (mh)
+  * add testsuite in tests/ directory. (dancerj)
+  * dpatch-edit-patch.functions (dpep_template_hardcoded): change to
+    accept patch description lines. (dancerj)
+  - -d option works now with hardcoded default, when 00template does not exist.
+  * dpatch-edit-patch.1, dpatch-edit-patch: new option --stampdir to specify
+    debian/patched directory. (dancerj)
+  * Bug fix: "running dpatch-edit-patch in a patched source tree leads to
+    errors during clean target" (Closes: #314494). (dancerj)
+  - This is also a response for request of OOo patch system.
+    Rather than taking that approach, we check more rigorously.
+    (Closes: #290820)
+  - dpep: Check for debian/patched/patch.dpatch,
+    and require --clean option to be specified in that case.
+  - tests/05_edit_with_patched now passes.
+  * dpatch-edit-patch does not give out an error message when --debianonly flag is given a nonexisting file, patch from mh. (closes: #317758)
+    tests/10_dpep_debianonly.sh output is fixed.
+  * Feature implementation:
+    "dpatch-get-origtargz does not found upstream tarballs in
+    ../upstream", thanks to Stefano Zacchiroli (Closes: #315719)
+  * Fix curl detection. (mh) (Closes: #317757)
+  * Standards-Version: 3.6.2 (no changes needed) (mh)
+
+ -- Marc Haber <mh+debian-packages@zugschlus.de>  Tue, 19 Jul 2005 15:43:58 +0000
+
+dpatch (2.0.13) unstable; urgency=low
+
+  * upload to unstable.
+
+ -- Marc Haber <mh+debian-packages@zugschlus.de>  Mon,  6 Jun 2005 21:33:52 +0000
+
+dpatch (2.0.12) experimental; urgency=low
+
+  * Marc Haber:
+    + New maintainer team: Maintainers point to dpatch-maintainers@
+      lists.alioth.debian.org, team members are in Uploaders.
+    + (dpatch-get-origtargz): New script to find upstream tarball, also
+      available for third parties (for example a svn-buildpackage
+      hook). (Closes: #291666)
+    + (dpatch-edit-patch): Adapt to use external code
+    + (dpatch-edit-patch): Allow replacing of dpatch-get-origtargz by
+      a user-supplied hook script. Discussion of this feature is in
+      BTS #291668.
+    + (dpatch-edit-patch): Add config file
+      debian/patches/00dpatch.conf where selected configuration variables
+      can be set from within the package. (Closes: #291668).
+    + (dpatch-edit-patch): re-work dpep parameter processing to use
+      getopt. (Closes: #291665)
+    + (dpatch-edit-patch): dereference all symlinks on reference or
+      work copy cration. (Closes: #275700)
+    + (dpatch_lowlevel.shpp): display correct path to *.dpatch.failed.
+      (Closes: #306978)
+    + (dpatch.make): do not reverse UNPATCHLIST. (Closes: #305023)
+    + (dpatch-edit-patch): Exclude CVS and .svn from the reference and
+      working copy (configurable via the --exclude option). (Closes: #209112)
+  * Junichi Uekawa:
+    + (dpatch-convert-diffgz.1): Clarify documentation to say that it is
+      using 'Debian' .diff.gz created throught dpkg-buildpackage.
+
+ -- Marc Haber <mh+debian-packages@zugschlus.de>  Sun, 15 May 2005 14:38:32 +0000
+
+dpatch (2.0.11) experimental; urgency=low
+
+  * Gergely Nagy:
+    + Fix 01_config.dpatch; thanks, Peter Eisentraut. (Closes: #274533).
+    + Fix dpatch-edit-patch(1) by removing the executable template docs;
+      patch from Nico Golde. (Closes: #254689)
+    + Update dpatch(1) example section, mentioning parallel builds.
+      Patch from Eduard Bloch. (Closes: #271831)
+    + Removed the README, as fast everything in it is duplicated on the
+      manual pages, and those are kept up to date.
+    + Swapped Joerg and myself (Maintainer<->Uploaders). Chocolate,
+      flowers and whatnot to my room, please.
+    + Fixed dpatch-edit-patch's --help option parsing.
+    + debian/control (Suggests): Added curl, as dpatch-edit-patch might
+      use it in some cases, if available.
+  * Marc Haber:
+    + [dpatch-edit-patch]: Changed the default behaviour to not clean the
+      work drirectory, and added a --clean switch to restore the former
+      mode of operation. (Closes: #288282)
+    + [dpatch-edit-patch]: Added a --debianonly switch to support
+      debian/-only source package layouts. (Closes: #288284)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 16 Jan 2005 14:06:55 +0100
+
+dpatch (2.0.10) unstable; urgency=high
+
+  * Gergely Nagy:
+    + Install NEWS.Debian; thanks, Peter Eisentraut. (Closes: #275163).
+    + Urgency set to high, so we can get in sarge, maybe.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Thu,  7 Oct 2004 10:04:05 +0200
+
+dpatch (2.0.9) unstable; urgency=low
+
+  * Nico Golde:
+    + Fixed dpatch-convert-diffgz.1, patch from Helge
+      Kreutzmann. (Closes: #242893)
+    + Fixed dpatch deapply documentation, patch from Shaul Karl.
+      (Closes: #255476)
+  * Gergely Nagy
+    + Fixed dpatch-edit-patch local information leak, patch from Darren
+      Salt. (Closes: #240709)
+    + Modified the default templates to call patch with -g0. Requested by
+      John V. Belmonte. (Closes: #259662)
+    + Extracted commonly used dpatch scriptlet code, providing two new
+      ways to make a dpatch scriptlet shorter and lighter. See
+      NEWS.Debian for details. Thanks to Tobias Grimm, Thomas Günther for
+      their ideas. (Closes: #259356)
+    + Made dpatch-edit-patch call dpatch deapply-all directly, upon
+      cleaning. Request from Bastian Kleineidam. (Closes: #260666)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Tue, 17 Aug 2004 16:35:53 +0200
+
+dpatch (2.0.8) unstable; urgency=low
+
+  * Fix typo in dpatch-edit-patch from previous upload
+
+ -- David B. Harris <dbharris@debian.org>  Tue, 16 Mar 2004 23:17:13 -0500
+
+dpatch (2.0.7) unstable; urgency=medium
+
+  * dpatch/dpatch_lowlevel.shpp:
+    + Don't create stampfile if the patch failed to apply, create
+      stampfile.failed instead
+    + When applying a patch failes, record its md5sum in stampfile.failed
+    + When unapplying patches, if .failed exists and the md5sum matches still
+      matches, ignore failure (a half-applied patch will be successfully
+      reverted if the patch hasn't changed)
+  * dpep/dpatch-edit-patch: Don't mistakenly apply patch in source tree (which
+    it will if you're editing the first patch in 00list). (Closes: #235596)
+  * debian/control: Change my Uploaders: email address from my private one to
+    dbharris@debian.org
+
+ -- David B. Harris <dbharris@debian.org>  Mon,  1 Mar 2004 13:13:26 -0500
+
+dpatch (2.0.6) unstable; urgency=high
+
+  * Gergely Nagy:
+    - dpep/dpatch-edit-patch: When editing a pre-existing patch, force
+      dpatch to skip creating stamp files (as they'd show up in the diff,
+      which is a Bad Thing).
+    - dpatch/dpatch_patchset.shpp: Fixed a serious file name comparsion
+      bug (noticed by David B Harris).
+  * David B Harris:
+    - dpep/dpatch-edit-patch: Use 'debian/rules clean unpatch' to clean the
+      source tree before replication - this allows for one to ship a
+      regular-style source package (with all the patches applied to the tree)
+      even if dpatch is used. Thanks, Bill Allombert. (Closes: #195823)
+    - Use 'grep -F' instead of 'egrep -F'. The latter is seriously broken.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Mon, 23 Feb 2004 21:26:34 +0100
+
+dpatch (2.0.5) unstable; urgency=medium
+
+  * David B Harris:
+    - Mention in the manpage that if a maintainer wants to preprocess their
+      00list with cpp, they need to add it to Build-Depends or
+      Build-Depends-Indep, as it isn't a dpatch dependency.
+    - dpatch/dpatch_lowlevel.shpp: Make sure stampfile is put in place even if
+      patching fails - without this, a half-applied dpatch wouldn't be
+      un-half-applied via 'debian/rules unpatch'. Future attempts to
+      'debian/rules patch', even with a fixed dpatch, would fail.
+    - dpatch/dpatch_template.shpp: Add @DPATCH@ tag to generated template
+    - dpep/dpatch-edit-patch: Fix bug where if the interactive subshell exited
+      with *anything* other than 0, the script would abort (and not clean up,
+      at that). The intention is to only abort if the shell exits with code
+      230 (ie: the developer explicitly goes 'exit 230').
+    - dpep/dpatch-edit-patch{,.functions}: Port to using new /usr/bin/dpatch
+      calls instead of reimplementing the (old) dpatch.make. Also support an
+      executable 00template (which is supposed to dump the dpatch header to
+      STDOUT) via DPEP_OPTION_EXEC_TEMPLATE=1 in 00options. Not yet
+      documented.
+
+ -- David B Harris <david@eelf.ddts.net>  Tue, 17 Feb 2004 04:24:14 -0500
+
+dpatch (2.0.4) unstable; urgency=low
+
+  * Gergely Nagy:
+    - Handle empty 00list files correctly, patch from Daniel Kobras.
+      (Closes: #228556)
+    - Fixed dpatch-convert-diffgz, which was broken some time ago.
+  * David B. Harris:
+    - Use `head -n 1' instead of `head -1', patch from Robert Luberda.
+      (Closes: #229941)
+    - Added support for debian/patches/00options (see man page for
+      details).
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 15 Feb 2004 12:55:34 +0100
+
+dpatch (2.0.3) unstable; urgency=medium
+
+  * Gergely Nagy:
+    - Do not ship NEWS.Debian. (Noticed by Jordi Mallach and Joey Hess)
+      (Closes: #227991)
+    - Updated README to note that there are cases when patch-stamp should
+      be a prerequisite of something else than build-stamp.
+      (Closes: #197956)
+    - Implemented configuration file support (no documentation yet,
+      sorry).
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 18 Jan 2004 14:49:00 +0100
+
+dpatch (2.0.2) unstable; urgency=low
+
+  * Gergely Nagy:
+    - dpatch --workdir does not cd to the destination directory
+      anymore. Add a --chdir option to restore the old behaviour.
+    - README made clear about patch order. Thanks to Steve Greenland for
+      noticing. (Closes: #223876)
+    - Written a short dpatch(7).
+    - Fixed bashisms, thanks to Ian Dichkovsky. (Closes: #224879)
+    - Made dpatch patch-template work with a diff on its STDIN.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sat, 10 Jan 2004 13:28:20 +0100
+
+dpatch (2.0.1) experimental; urgency=low
+
+  * Gergely Nagy:
+    - Fixed example installation, noticed by Geert Stappers.
+      (Closes: #217136)
+    - Include README.arch in the binary package. Patch from Geert
+      Stappers. (Closes: #221976)
+    - Mention README.arch in the README. Patch from Geert Stappers.
+      (Closes: #221979)
+    - Update README.arch, so it has commands for tla 1.0 too. Omission
+      noticed by Geert Stappers. (Closes: #221980)
+    - Restore dpatch1 compatibility. Noticed and solution provided by
+      Geert Stappers. (Closes: #222006)
+    - Implemented "dpatch log" and added a "--verbose" option to the apply
+      and deapply sub-commands. Requested by Geert Stappers.
+      (Closes: #222103)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sat,  6 Dec 2003 20:51:59 +0100
+
+dpatch (2.0.0) experimental; urgency=low
+
+  * Gergely Nagy:
+    - Rewritten dpatch to be a stand-alone script, with a compatibility
+      dpatch.make wrapper.
+    - As a side effect, this fixes the following bugs:
+      + #203999: dpatch: Extension check in unpatch is leaking.
+      + #217040: leaks private information from development environment
+      + #209107: dpatch: reserving some of the patch $1 namespace for
+        package use.
+      + #209109: dpatch: like to expliticly patch a random src tree copy.
+      + #217045: should revert half-failed patches
+        (Use dpatch --force for this functionality)
+    - Reorganised the examples, and added a new one:
+      + #217136: dpatch example : config.{guess,sub}. Thanks to Ralf
+        Treinen.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 16 Nov 2003 15:28:31 +0100
+
+dpatch (1.24) unstable; urgency=medium
+
+  * David B Harris:
+    - Revert broken @DPATCH@ preservation behaviour, which was introduced by
+      a submitted patch some time ago. Thanks to Eduard Bloch for pointing
+      it out. (Closes: #203968)
+
+ -- David B Harris <david@eelf.ddts.net>  Sun,  3 Aug 2003 06:42:42 -0400
+
+dpatch (1.23) unstable; urgency=low
+
+  * Henrique de Moraes Holschuh:
+    - dpatch.make (PATCHLIST): Only expand this once.
+    (UNPATCHLIST): Likewise.
+    (DEB_BUILD_ARCH): New variable.
+    (DPATCH_ARCH): Use ${DEB_BUILD_ARCH}, to be far more friendly to
+    existing practice.
+    - README: Added a note about dpatch.make's usage of ${PACKAGE}, and a
+    warning about some dpatch-* tools not respecting ${PATCHLIST}.
+  * Gergely Nagy:
+    - dpatch.make (PATCHLIST): Removed the sorting stuff.
+    - dpatch-list-patch: Likewise.
+  * The removal of the sorting stuff, and Henrique's changes:
+    (Closes: #203353).
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Thu, 31 Jul 2003 12:33:04 +0200
+
+dpatch (1.22) unstable; urgency=low
+
+  * Brown paper bag release:
+    - 'dpatch.make:45: *** unterminated call to function `shell': missing `)'
+      fixed, caused all builds with 1.21 to break. Let us never upload on
+      Friday the 13th again.
+
+ -- David B Harris <david@eelf.ddts.net>  Sat, 14 Jun 2003 04:01:28 -0400
+
+dpatch (1.21) unstable; urgency=low
+
+  * Gergely Nagy:
+    - dpatch.make (PATCHLIST_ALL): Do not hide stderr.
+      (PATCHLIST_ARCH): Likewise.
+      Patch from Joshua Kwan and Era Eriksson. (Closes: #195626)
+  * David B Harris:
+    - dpatch-edit-patch.functions (dpep_template_hardcoded):
+      Don't append .dpatch to patch filename, dpep-edit-patch does that for
+      us. Thanks James Troup, Closes: #196329
+    - dpatch-edit-patch: Fix bad sed call (Closes: #196893)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Fri, 13 Jun 2003 22:52:52 +0200
+
+dpatch (1.20) unstable; urgency=low
+
+  * David B. Harris:
+    - dpatch-edit-patch, dpatch-edit-patch.functions, dpatch-edit-patch.1:
+      + The meaning of CLI option -k (keep temporary working directory) was
+        reversed. Thanks to Era Eriksson for the patch :) (Closes: #193392)
+      + Another patch from Era - thanks again! This one allows
+        debian/patches/00template to be executable. See the manpage for more
+        details. (Closes: #193481)
+  * Gergely Nagy:
+    - debian/control (Standards-Version): Bumped to 3.5.10.0.
+    - dpatch.make (PATCHLIST_ALL): Redirect stderr to /dev/null.
+      (PATCHLIST_ARCH): Likewise.
+      Noticed by James Troup. (Closes: #195104)
+    - debian/rules (binary-indep): Mark all files in ${DPATCH}/etc as
+      conffiles.
+    - dpatch-list-patch: Use "$( (" instead of "$((". The latter is
+      treated as an aritmetic expression by dash, thus parsing fails. With
+      a space between the two parens, it is correctly recognised as a
+      nested command substitution thingy.
+    - dpatch-convert-diffgz: Addedd support for epochs. Patch from Junichi
+      Uekawa. (Closes: #195443)
+
+ -- David B Harris <david@eelf.ddts.net>  Mon, 26 May 2003 03:00:28 -0400
+
+dpatch (1.19) unstable; urgency=low
+
+  * Gergely Nagy:
+    - dpatch-edit-patch.1: Corrected a typo. Noticed by Stephen Quinney
+      (Closes: #190557)
+    - dpatch-list-patch (dplp_print_info): New function. This handles
+      adding the .dpatch suffix when necessary. Use this to print
+      information about a dpatch.
+
+      Also, if there is no debian/patches/00list, use some clever GNU make
+      trickery to extract ${PATCHLIST} out of debian/rules (probably needs
+      polishing though)
+    - dpatch-convert-diffgz: Remove the .dpatch suffix from
+      DPCD_PATCHNAME, if any.
+    - dpatch.make (patch): Check if $$patch exists, and only append a
+      .dpatch prefix if it doesn't.
+      (unpatch): Likewise.
+      (PATCHLIST_ALL): Allow `#' comments in the patch list (ie, filter
+      them out)
+      (PATCHLIST_ARCH): Likewise. Patch from Bastian Kleineidam.
+      (Closes: #192509)
+    - The last two entries, as well as the next two, Closes: #191277
+    - README: Updated according to recent changes.
+  * David B Harris:
+    - dpatch-edit-patch: Loosen the format of debian/patches/00list. Now
+      somebody can supply the .dpatch extension therein, should they choose to
+      do so.
+    - dpatch-list-patch: Add comment-line support for dpatch-list-patch.
+      (closes the other half of #192509)
+    - Include a bash context-sensitive completion definition file,
+      /etc/bash_completion.d/dpatch_edit_patch, kindly written by Bastian
+      Kleineidam and cleaned up by myself. (Closes: #191453)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Fri,  9 May 2003 00:51:20 +0200
+
+dpatch (1.18) unstable; urgency=low
+
+  * David B Harris:
+    - README: Clarify format of debian/patches/00list (Closes: #190343)
+  * Gergely Nagy:
+    - dpatch-edit-patch.1: Minor markup fixes and enhancements.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Wed, 23 Apr 2003 17:24:57 +0200
+
+dpatch (1.17) unstable; urgency=low
+
+  * David B. Harris:
+   - dpatch-edit-patch(1) rewrite. Please read `man dpatch-edit-patch', and/or
+     /usr/share/doc/dpatch/README, it has changed a great deal. Basically, now
+     you just 'dpatch-edit-patch dpathname', where dpatchname is exactly as it
+     would be listed in 00list. dpep will spawn a subshell. Edit your files.
+     Exit the subshell. The dpatch will be created or updated, as is required.
+     (Closes: #187959)
+   - Rewrite manpage for dpatch-edit-patch. Thanks to Andreas Metzler for the
+     current groff formatting. (Closes: #188486)
+   - Clarify examples and README with respect to phony targets and what that
+     means.
+  * Joerg Jaspert:
+   - Added David B. Harris to Uploaders Field.
+
+ -- Joerg Jaspert <joerg@debian.org>  Fri, 11 Apr 2003 16:36:43 +0200
+
+dpatch (1.16) unstable; urgency=low
+
+  * Gergely Nagy:
+    - The `Figure out something to put here, and delete this' release.
+    - dpatch.make (patch): (patch-stamp): Create a subdirectory under
+      debian/patched, if necessary. Patch from David B Harris.
+      (unpatch): Remove patch-stampT too. Suggestion from Joshua Kwan.
+      (Closes: #186522)
+  * Joerg Jaspert:
+    - Added a paragraph about usage of .PHONY or stamp-files to the
+      README and changed one example rules file so we show both ways
+      of playing with it. This (closes: #187293)
+
+ -- Joerg Jaspert <joerg@debian.org>  Sun,  6 Apr 2003 01:19:23 +0200
+
+dpatch (1.15) unstable; urgency=low
+
+  * The `Feh, you missed me!' release.
+  * dpatch-edit-patch.1: Fixed a typo I introduced when importing Andreas'
+    work. Noticed by him.
+  * debian/control (Standards-Version): Bumped to 3.5.9.0.
+    (Description): Rearranged a bit, to look more structured.
+  * dpatch-edit-patch: Bail out if ${DPEP_TMPDIR} does not exist. This way
+    we can safely use mkdir to create ${DPEP_OUTDIR}, and then check its
+    exit status. Fix suggested by David B Harris. (Closes: #182640)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 16 Mar 2003 23:58:24 +0100
+
+dpatch (1.14) unstable; urgency=low
+
+  * The `dpatch-edit-patch is not broken, but shoot me anyway' release.
+  * dpatch-convert-diffgz: Made it actually work. (Patch courtesy of
+    Manuel Estrada Sainz) (Closes: #183976)
+  * dpatch-edit-patch.1 (EXAMPLES): New section, heavily based on the work
+    of Andreas Metzler.
+  * The above change and parts of 1.13 together closes: #182644.
+    
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Mon, 10 Mar 2003 15:44:15 +0100
+
+dpatch (1.13) unstable; urgency=low
+
+  * The `dpatch-edit-patch is broken' release.
+  * dpatch-edit-patch: Bail out if the temporary directory already
+    exists. (Closes: #182640)
+  * dpatch-edit-patch: Describe in more detail what it does, for easier
+    problem tracking. (Closes: #182641)
+  * dpatch-edit-patch: Changed default description to something less lame
+    and productive.
+  * dpatch-edit-patch: Fixed a typo.
+  * dpatch-edit-patch: Added ${DPEP_PKGNAME} to some more places, so it
+    will actually work.
+  * dpatch-edit-patch.1 (NOTES): New section, mentioning how the author
+    information is determined.
+  * The above ones fix the multi-problem bugreport from James Troup,
+    except the EXAMPLES section in dpatch-edit-patch.1.
+  * dpatch.make (unpatch): Remove debian/patched too. (Noticed by Steve
+    Kowalik)
+  * dpatch.make: Use make syntax, not shell, when determining DPATCH_ARCH.
+    Thanks to Martin Loschwitz. (Closes: #183828)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Thu, 27 Feb 2003 14:36:23 +0100
+
+dpatch (1.12) unstable; urgency=low
+
+  * dpatch-list-patch now really does what i announced in 1.10. Silly me.
+    (closes: #182590)
+  * Mention the needed Build-Depends in Readme. (closes: #182598)
+
+ -- Joerg Jaspert <joerg@debian.org>  Wed, 26 Feb 2003 22:00:14 +0100
+
+dpatch (1.11) unstable; urgency=low
+
+  * dpatch.make (patch): Accept single-char comments too. (Noticed by
+    Steve Kowalik)
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Tue, 25 Feb 2003 14:28:40 +0100
+
+dpatch (1.10) unstable; urgency=low
+
+  * dpatch-list-patch now recognizes Comments that start with # DP:
+    or ## DP:
+
+ -- Joerg Jaspert <joerg@debian.org>  Tue, 25 Feb 2003 11:31:33 +0100
+
+dpatch (1.9) unstable; urgency=low
+
+  * Now dpatch-edit-patch adds the source-package name to tmpdirs it
+    creates. That way they dont conflict if you edit similar patchnumbers
+    in different packages. (closes: #182134)
+
+ -- Joerg Jaspert <joerg@debian.org>  Tue, 25 Feb 2003 00:09:58 +0100
+
+dpatch (1.8) unstable; urgency=low
+
+  * Modified README to reflect latest changes to dpatch and its tools.
+    If you are a better documentation writer: Please take a look at
+    this file and make it readable. Thx. :)
+  * Modified dpatch-list-patches to list patches that apply everywhere
+    (eg. that are in 00list) and patches that apply only on specific
+    Architectures (eg. listed in 00list.*) with different headers.
+  * Modified Description to tell users that its easy to have
+    architecture specific patches now. :)
+
+ -- Joerg Jaspert <joerg@debian.org>  Mon, 24 Feb 2003 23:35:01 +0100
+
+dpatch (1.7) unstable; urgency=low
+
+  * Modularized the patch list. It is now constructed from
+    debian/patches/00list and 00list.${ARCH} (where ${ARCH} is the
+    architecture we're building for). Also, one can override the PATCHLIST
+    variable, and that will Just Work. So you can use dpatch without
+    00list too! :)
+  * Applied meta-data preserving patch to dpatch-edit-patch, thanks to
+    Eduard Bloch. (Closes: #182140)
+  * Added dpatch-convert-diffgz from Junichi Uekawa (with minor
+    modifications). (Closes: #176831)
+  * debian/control (Recommends): Recommend dpkg-dev, fakeroot and
+    patchutils, since we are using them in some of the scripts.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Mon, 24 Feb 2003 18:17:10 +0100
+
+dpatch (1.6) unstable; urgency=low
+
+  * Applied tree-root finder patch by Junichi Uekawa.
+    (Closes: #176507)
+  * Added a modified version of dpatch-list-patch by Junichi.
+    (Closes: #176633)
+  * Also corrected some minor shortcomings in the dpatch-edit-patch
+    manual, and wrote one for d-l-p.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 19 Jan 2003 00:53:07 +0100
+
+dpatch (1.5) unstable; urgency=low
+
+  * Description and readme improvements, thx to era eriksson. (closes: #175000)
+
+ -- Joerg Jaspert <joerg@debian.org>  Thu,  2 Jan 2003 11:56:04 +0100
+
+dpatch (1.4) unstable; urgency=low
+
+  * Reverted dry-run test: Errors are handled by dpatch target in makefiles.
+  * Use -p1 instead of -p0 in dpatch-edit-patch generated patch files.
+  * There was the include for /usr/share/dpatch/dpatch.make missingin sample.rules2
+
+ -- Joerg Jaspert <joerg@debian.org>  Tue, 31 Dec 2002 21:08:43 +0100
+
+dpatch (1.3) unstable; urgency=low
+
+  * Patch from Eduard Bloch:
+    - better pattern to fish the EMAIL address
+    - fixed some bashisms
+    - --dry-run test before patching to prevent trouble when only parts of the
+        patch fail
+
+ -- Joerg Jaspert <joerg@debian.org>  Sat, 28 Dec 2002 15:15:59 +0100
+
+dpatch (1.2) unstable; urgency=low
+
+  * Updated description.
+  * Updated README.
+
+ -- Joerg Jaspert <joerg@debian.org>  Sat, 28 Dec 2002 02:23:40 +0100
+
+dpatch (1.1) unstable; urgency=low
+
+  * Added option to set description and name of the patch file.
+
+ -- Joerg Jaspert <joerg@debian.org>  Sat, 28 Dec 2002 01:18:50 +0100
+
+dpatch (1.0) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Joerg Jaspert <joerg@debian.org>  Sat, 21 Dec 2002 00:59:29 +0100

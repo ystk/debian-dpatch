@@ -1,0 +1,75 @@
+   check dpatch-list-patch works.
+   Depends on 06,07.
+   Also, run dpatch-edit-patch with -d option, and check that
+   -d only has effect on newly created patches
+
+=== output of dpatch-list-patch
+Patches that would be applied:
+debian/patches/01_edpatch.dpatch (Junichi Uekawa <dancer@debian.org>):
+  No description.
+
+debian/patches/02_another.dpatch (Junichi Uekawa <dancer@debian.org>):
+  No description.
+
+debian/patches/03_description.dpatch (Junichi Uekawa <dancer@debian.org>):
+  Description of this patch
+
+=== check for obvious entries in output of dpatch-list-patch
+debian/patches/01_edpatch.dpatch (Junichi Uekawa <dancer@debian.org>):
+  No description.
+  No description.
+debian/patches/03_description.dpatch (Junichi Uekawa <dancer@debian.org>):
+  Description of this patch
+=== Edit patch with an attempt for changed description
+dpatch deapply-all
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+dpatch-edit-patch: * /tmp/XXXX/dpatch-test/debian/patches/03_description.dpatch exists, this patch will be updated.
+dpatch-edit-patch: * Copying /tmp/XXXX/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+dpatch-edit-patch: * Applying patches
+applying patch 01_edpatch to ./ ... ok.
+applying patch 02_another to ./ ... ok.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+dpatch-edit-patch: * Applying current 03_description.dpatch for editing.
+applying patch 03_description to ./ ... ok.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: Updating patch /tmp/XXXX/dpatch-test/debian/patches/03_description.dpatch
+dpatch-edit-patch: @DPATCH@ tag found, preserving dpatch header.
+dpatch-edit-patch: /tmp/XXXX/dpatch-test/debian/patches/03_description.dpatch updated.
+=== Make sure dpatch-list-patch picks up the new description
+Patches that would be applied:
+debian/patches/01_edpatch.dpatch (Junichi Uekawa <dancer@debian.org>):
+  No description.
+
+debian/patches/02_another.dpatch (Junichi Uekawa <dancer@debian.org>):
+  No description.
+
+debian/patches/03_description.dpatch (Junichi Uekawa <dancer@debian.org>):
+  Description of this patch
+
+  Description of this patch

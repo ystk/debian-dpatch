@@ -1,0 +1,55 @@
+#! /bin/sh
+## dpatch.hook -- arch hook for dpatch			-*- shell-script -*-
+## Source this from ~/.arch-params/hook, and be happy.
+
+MAILLIST=dpatch_cvs@packages.qa.debian.org
+WITH_DIFFS=1
+CATEGORY=dpatch
+
+case $1 in
+	commit)
+		ARCH_CATEGORY=$(tla parse-package-name --category ${ARCH_REVISION})
+		ARCH_BRANCH=$(tla parse-package-name --branch ${ARCH_REVISION})
+		ARCH_VERSION=$(tla parse-package-name --package-version ${ARCH_REVISION})
+		case ${ARCH_CATEGORY} in
+			${CATEGORY})
+				logfile=$(tempfile)
+				tla cat-archive-log "${ARCH_ARCHIVE}/${ARCH_REVISION}" >${logfile}
+				subj=$(grep "^Summary: " ${logfile} | head -n 1)
+
+				echo >>${logfile}
+				tla get "${ARCH_ARCHIVE}/${ARCH_REVISION}" ${logfile}.d
+				PN=$(expr $(echo ${ARCH_REVISION} | sed -e "s,^.*-\([0-9]\+\)$,\1,") - 1)
+				if [ ${PN} -eq -1 ]; then
+					PR=$(echo ${ARCH_REVISION} | sed -e "s,-patch-[0-9]\+$,-base-0,")
+				else
+					PR=$(echo ${ARCH_REVISION} | sed -e "s,-[0-9]\+$,-${PN},g")
+				fi
+
+				tla changes -d ${logfile}.d ${WITH_DIFFS+--diffs} "${ARCH_ARCHIVE}/${PR}" | \
+					filterdiff -x '*/{arch}/*' >>${logfile}
+				
+				rm -rf ${logfile}.d
+
+				mail -s "[${ARCH_CATEGORY} commit] ${subj#Summary: } @ ${ARCH_VERSION}" ${MAILLIST} <${logfile}
+				rm -f -- "${logfile}"
+				;;
+		esac
+		;;
+	import)
+		ARCH_CATEGORY=$(tla parse-package-name --category ${ARCH_REVISION})
+		ARCH_BRANCH=$(tla parse-package-name --branch ${ARCH_REVISION})
+		ARCH_VERSION=$(tla parse-package-name --package-version ${ARCH_REVISION})
+		case ${ARCH_CATEGORY} in
+			${CATEGORY})
+				logfile=$(tempfile)
+				tla cat-archive-log "${ARCH_ARCHIVE}/${ARCH_REVISION}" >${logfile}
+				subj=$(grep "^Summary: " ${logfile} | head -n 1)
+				mail -s "[${ARCH_CATEGORY} import] ${subj#Summary: } @ ${ARCH_VERSION}" ${MAILLIST} <${logfile}
+				rm -f -- "${logfile}"
+				;;
+		esac
+		;;
+esac
+
+## arch-tag: 2eac5186-6869-44bc-81e6-5864b2550153

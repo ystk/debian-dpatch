@@ -1,0 +1,30 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH DPATCH-CONVERT_DIFFGZ 1 "April 19, 2004" DPATCH
+.SH NAME
+dpatch-convert-diffgz \- Convert a debian .diff.gz to a dpatch file
+.SH SYNOPSIS
+.BI dpatch\-convert\-diffgz " patchno patchname"
+.SH DESCRIPTION
+This manual page documents briefly the
+.B dpatch\-convert\-diffgz
+command which simply generates a dpatch file from an existing Debian .diff.gz
+file.
+
+It does so, by building the sources with dpkg-buildpackage, and operating on the
+resulting Debian .diff.gz.
+
+.SH "SEE ALSO"
+.BR "dpatch" "(1), "
+.BR "dpatch" "(7), "
+.BR "dpatch.make" "(7), "
+.BR "dpatch\-edit\-patch" "(1), "
+.BR "dpatch\-list\-patch" "(1), "
+.BR "dpatch\-get\-origtargz" "(1)"
+
+.RI "Files in " "/usr/share/doc/dpatch/"
+.SH AUTHOR
+dpatch\-convert\-diffgz was written by Junichi Uekawa <dancer@debian.org>.
+.br
+This manual page was written by Gergely Nagy <algernon@debian.org>.
+
+.\" arch-tag: d42717d2-2974-4709-9f99-1076d6e2851b

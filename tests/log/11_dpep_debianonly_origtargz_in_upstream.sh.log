@@ -1,0 +1,101 @@
+   Check that --debianonly option is working in dpatch-edit-patch
+   with the auto-detection, finding the .tar.gz in ../upstream directory.
+   Bug: #315719 -- patch to use ../upstream
+   Depends on 10_dpep_debianonly.sh for setting up the environment.
+   Bug: #317775 -- fallback when orig.tar.gz does not exist does not work.
+
++ cd /tmp/XXXX/dpatch-test/../debianonly/dpatch-test
++ mv ../upstream ../hidden-upstream
++ echo 'echo yet-more-patch > 11 '
+++ pwd
++ dpatch-edit-patch -P/tmp/XXXX/debianonly/dpatch-test/../upstream --debianonly -d test 11_test_patch
+dpatch-edit-patch: * /tmp/XXXX/debianonly/dpatch-test/debian/patches/11_test_patch.dpatch does not exist, it will be created as a new dpatch.
+dpatch-edit-patch: * debian/-only layout selected
+DEBUG: try /tmp/XXXX/debianonly/dpatch-test/../upstream
+Reading package lists...
+Building dependency tree...
+Reading state information...
+E: Unable to find a source package for dpatch-test
+dpatch-get-origtargz: Error: apt-get source dpatch-test failed
+dpatch-get-origtargz: Error: unable to obtain dpatch-test_0.1.orig.tar.gz from anywhere
+dpatch-edit-patch: Error: unable to obtain upstream tarball, dpatch-get-origtargz failed
++ :
++ mv ../hidden-upstream ../upstream
++ echo 'echo yet-more-patch > 11 '
+++ pwd
++ dpatch-edit-patch -P/tmp/XXXX/debianonly/dpatch-test/../upstream --debianonly -d test 11_test_patch
+dpatch-edit-patch: * /tmp/XXXX/debianonly/dpatch-test/debian/patches/11_test_patch.dpatch does not exist, it will be created as a new dpatch.
+dpatch-edit-patch: * debian/-only layout selected
+DEBUG: try /tmp/XXXX/debianonly/dpatch-test/../upstream
+dpatch-edit-patch: * unpacking dpatch-test_0.1.orig.tar.gz
+dpatch-edit-patch: * Copying /tmp/XXXX/debianonly/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+dpatch-edit-patch: Warning: * No base-patch supplied, not applying any patches.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: * Creating new patch /tmp/XXXX/debianonly/dpatch-test/debian/patches/11_test_patch.dpatch
+dpatch-edit-patch: Warning: debian/patches/00template not exist, using hardcoded default.
+dpatch-edit-patch: /tmp/XXXX/debianonly/dpatch-test/debian/patches/11_test_patch.dpatch created.
++ echo 'echo yet-more-patch > 11 '
+++ pwd
++ dpatch-edit-patch --origtargzpath=/tmp/XXXX/debianonly/dpatch-test/../upstream --debianonly -d test 11_test_patch
+dpatch-edit-patch: * /tmp/XXXX/debianonly/dpatch-test/debian/patches/11_test_patch.dpatch exists, this patch will be updated.
+dpatch-edit-patch: * debian/-only layout selected
+DEBUG: try /tmp/XXXX/debianonly/dpatch-test/../upstream
+dpatch-edit-patch: * unpacking dpatch-test_0.1.orig.tar.gz
+dpatch-edit-patch: * Copying /tmp/XXXX/debianonly/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+dpatch-edit-patch: Warning: 11_test_patch.dpatch is not listed in debian/patches/00list, no other patches will be applied to the working directory.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+dpatch-edit-patch: * Applying current 11_test_patch.dpatch for editing.
+applying patch 11_test_patch to ./ ... ok.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: Updating patch /tmp/XXXX/debianonly/dpatch-test/debian/patches/11_test_patch.dpatch
+dpatch-edit-patch: @DPATCH@ tag found, preserving dpatch header.
+dpatch-edit-patch: /tmp/XXXX/debianonly/dpatch-test/debian/patches/11_test_patch.dpatch updated.
++ grep yet-more-patch debian/patches/11_test_patch.dpatch
++yet-more-patch

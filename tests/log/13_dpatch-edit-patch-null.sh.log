@@ -1,0 +1,4 @@
+   check dpatch-edit-patch without command-line options.
+
+=== dpatch-edit-patch with NULL command-line option
+dpatch-edit-patch: Error: patchname is empty, please specify, aborting.

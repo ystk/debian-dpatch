@@ -1,0 +1,93 @@
+   create two patches that conflict, and make sure applying both fails.
+
+01_edpatch
+02_another
+03_description
+dpatch-edit-patch: * /tmp/XXXX/dpatch-test/debian/patches/05_conflicting1.dpatch does not exist, it will be created as a new dpatch.
+dpatch-edit-patch: * Copying /tmp/XXXX/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+dpatch-edit-patch: Warning: * No base-patch supplied, not applying any patches.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: * Creating new patch /tmp/XXXX/dpatch-test/debian/patches/05_conflicting1.dpatch
+dpatch-edit-patch: Warning: debian/patches/00template not exist, using hardcoded default.
+dpatch-edit-patch: /tmp/XXXX/dpatch-test/debian/patches/05_conflicting1.dpatch created.
+dpatch-edit-patch: * /tmp/XXXX/dpatch-test/debian/patches/05_conflicting2.dpatch does not exist, it will be created as a new dpatch.
+dpatch-edit-patch: * Copying /tmp/XXXX/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dpatch deapply-all
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+03_description not applied to ./ .
+02_another not applied to ./ .
+01_edpatch not applied to ./ .
+dpatch-edit-patch: Warning: * No base-patch supplied, not applying any patches.
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: * Creating new patch /tmp/XXXX/dpatch-test/debian/patches/05_conflicting2.dpatch
+dpatch-edit-patch: Warning: debian/patches/00template not exist, using hardcoded default.
+dpatch-edit-patch: /tmp/XXXX/dpatch-test/debian/patches/05_conflicting2.dpatch created.
+applying patch 05_conflicting1 to ./ ... ok.
+applying patch 05_conflicting2 to ./ ... failed.
+attempting to revert failed patch 05_conflicting2 from ./:
+  md5sums match, proceeding ... done (neither success nor failure guaranteed)
+reverting patch 05_conflicting1 from ./ ... ok.
+applying patch 05_conflicting1 to ./ ...
+patching file 10
+
+applying patch 05_conflicting2 to ./ ...
+The next patch would create the file 10,
+which already exists!  Applying it anyway.
+patching file 10
+Patch attempted to create file 10, which already exists.
+Hunk #1 FAILED at 1.
+1 out of 1 hunk FAILED -- saving rejects to file 10.rej
+
+attempting to revert failed patch 05_conflicting2 from ./:
+  md5sums match, proceeding ...
+patching file 10
+Hunk #1 FAILED at 1.
+File 10 is not empty after patch, as expected
+1 out of 1 hunk FAILED -- saving rejects to file 10.rej
+
+reverting patch 05_conflicting1 from ./ ...
+patching file 10
+

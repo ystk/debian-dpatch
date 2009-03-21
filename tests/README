@@ -1,0 +1,24 @@
+[Testsuite documentation]
+
+This directory contains the testsuite for dpatch.
+Run the run-test.sh program with this directory as current directory.
+
+This testsuite requires the following packages installed:
+     dpatch (it will not run the test against the source)
+     debhelper
+
+The order of scripts is important; to add new tests, 
+add it after the existing tests.
+The tests are of [0-9][0-9]_*.sh style.
+
+The exit code of the scripts are used to convey success/fail of tests.
+    0: success
+    non-0: failure
+
+
+The log of execution is stored as test.log.summary,
+and log of individual runs are stored in log/$SCRIPTNAME
+compare the output between releases to find regression.
+
+
+ -- 11 Jul 2005, Junichi Uekawa <dancer@debian.org>

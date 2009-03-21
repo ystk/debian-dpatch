@@ -1,0 +1,251 @@
+#! /bin/bash
+## dpatch.shpp					-*- shell-script -*-
+##
+## Main dpatch control code.
+## 'dpatch.shpp' generates 'dpatch'.
+
+set -e
+set -o pipefail
+
+DPATCH_OPTION_FORCE=0
+DPATCH_OPTION_STRICT=0
+DPATCH_OPTION_CPP=0
+DPATCH_OPTION_CHDIR=0
+DPATCH_WORKDIR=./
+
+#:local-var SYSCONFDIR
+
+if [ -e "${SYSCONFDIR}/dpatch.conf" ]; then
+	. "${SYSCONFDIR}/dpatch.conf"
+fi
+
+if [ -e "${HOME}/.dpatch.conf" ]; then
+	. "${HOME}/.dpatch.conf"
+fi
+
+#:include dpatch_help.shpp
+#:include dpatch_lowlevel.shpp
+#:include dpatch_patchset.shpp
+#:include dpatch_args.shpp
+#:include dpatch_requisites.shpp
+#:include dpatch_template.shpp
+
+if [ $# -eq 0 ]; then
+	dpatch_help
+	exit 1
+fi
+
+while [ $# -gt 0 ]; do
+	case $1 in
+		--with-cpp)
+			DPATCH_CLI_OPTION_CPP=1
+			;;
+		--force|-F)
+			DPATCH_OPTION_FORCE=1
+			;;
+		--strict|-S)
+			DPATCH_OPTION_STRICT=1
+			;;
+		--chdir|-c)
+			DPATCH_OPTION_CHDIR=1
+			;;
+		--help|-h|--version|-V|--license)
+			break
+			;;
+		--workdir|-d)
+			case $2 in
+				/*)
+					DPATCH_WORKDIR=$2
+					;;
+				*)
+					DPATCH_WORKDIR=$(pwd)/$2
+					;;
+			esac
+			shift
+			;;
+		-*)
+			echo "dpatch: Unsupported global option: $1" >&2
+			exit 1
+			;;
+		*)
+			break
+			;;
+	esac
+	shift || true
+done
+
+# Source debian/patches/00options here, as we need to know $DPATCH_WORKDIR first
+if [ -e "$DPATCH_WORKDIR/debian/patches/00options" ]; then
+    . "$DPATCH_WORKDIR/debian/patches/00options"
+fi
+
+# For each option we support both in the CLI and in 00options, the CLI should
+# set "DPATCH_CLI_OPTION_FOO", and the real option should be
+# "DPATCH_OPTION_FOO".  After sourcing 00options, one must check for each CLI
+# option for an override (we do want CLI options overriding 00options right?)
+if [ "$DPATCH_CLI_OPTION_CPP" = 1 ]; then
+    DPATCH_OPTION_CPP=1
+    unset DPATCH_CLI_OPTION_CPP
+fi
+
+# Check that we have everything we need, up until this point.
+if ! dpatch_requisites; then
+    echo "dpatch: aborting" >&2
+    exit 1
+fi
+
+command=$1; shift
+argc=$(dpatch_arg_count "$@")
+cmd_help=$(dpatch_arg_cmd_help "$@")
+cmd_mapped=$(dpatch_command_map ${command})
+
+case ${command} in
+	## Help commands
+	help|--help|-h)
+		dpatch_help_do "$@"
+		exit $?
+		;;
+	version|--version|-V)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_version "$@"
+		exit $?
+		;;
+	license|--license)
+		dpatch_license
+		exit $?
+		;;
+
+	## Template
+	patch-template)
+		dpatch_args_check ${cmd_help} ${argc} -1 2
+		dpatch_patch_template "$@"
+		exit $?
+		;;
+
+	## User-defined call to patches
+	call)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	call-until|call-up-to)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	call-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Applying of patches
+	patch|apply)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	apply-until|apply-up-to|patch-until|patch-up-to)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	apply-all|patch-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Deapplying of patches
+	unpatch|deapply)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	deapply-until|deapply-up-to|unpatch-until|unpatch-up-to)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	deapply-all|unpatch-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Listing patches
+	list)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	list-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	list-up-to|list-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Getting patch info/meta-data
+	cat)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	cat-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	cat-up-to|cat-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Getting patch status
+	status)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	status-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	status-up-top|status-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Showing patch logs
+	log)
+		dpatch_args_check ${cmd_help} ${argc} 1 -1
+		dpatch_patchset_do ${cmd_mapped} 1 "$@"
+		exit $?
+		;;
+	log-all)
+		dpatch_args_check ${cmd_help} ${argc} 0 0
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+	log-up-to|log-until)
+		dpatch_args_check ${cmd_help} ${argc} 1 1
+		dpatch_patchset_do ${cmd_mapped} 0 "$@"
+		exit $?
+		;;
+
+	## Catch-all
+	*)
+		dpatch_help
+		exit 1
+		;;
+esac
+
+## arch-tag: 2dce883d-27ed-45fb-8ef0-ea4582699471

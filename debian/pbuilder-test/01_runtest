@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd tests
+apt-get install -y --force-yes debhelper
+./run-test.sh

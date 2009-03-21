@@ -1,0 +1,77 @@
+dpatch (2.0.11) experimental; urgency=low
+
+  With this version, the default behaviour of dpatch-edit-patch was
+  changed to not clean the source tree before copying it. Also, a new
+  option which is intended to ease working with trees under revision
+  control that only have a debian/ directory, was added too. See the
+  manual page for more information about these (the --clean and
+  --debianonly options).
+
+  Please test the new features, so we can iron out any bugs before the
+  package hits unstable!
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 16 Jan 2005 14:38:58 +0100
+
+dpatch (2.0.9) unstable; urgency=low
+
+  This version of dpatch comes with two helper scripts, which make
+  the creation of dpatch scriptlets easier. For the most simple
+  cases, there is /usr/share/dpatch/dpatch-run, that should be used
+  on the she-bang line, like this:
+
+    #! /bin/sh /usr/share/dpatch/dpatch-run
+    ## foo.dpatch -- by J. Random Hacker
+    ## DP: Patch description
+
+    [And here comes the patch in the usual diff format]
+
+  This dpatch-run script will do all the shell magic to make the
+  dpatch work.
+
+  For advanced uses, where something other than patch is used for
+  applying dpatches, there is /usr/share/dpatch/dpatch.lib.sh. This
+  one is intended to be sourced by shell scripts. By default, it will
+  still use patch, however, setting DPATCH_LIB_NO_DEFAULT to a
+  non-empty value makes it call dpatch_patch and dpatch_unpatch,
+  respectively. The main use of this shell library is to leave the
+  command-line parsing and verification to the script.
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 15 Aug 2004 13:34:22 +0200
+
+dpatch (2.0.0) experimental; urgency=low
+
+  This is a complete rewrite of dpatch as a shell script with a well
+  defined interface, which provides enormous flexibility. This makes it
+  possible to do a set of interesting things with dpatch scriptlets, like
+  adding custom arguments (pkg-info, for printing detailed patch
+  information, and the like), filter the patch list through cpp, and many
+  other interesting things.
+
+  However, due to the amount of new code, we feel that this rewrite needs
+  wider testing, hence this upload to experimental.
+
+  Please help, and test this release, and report any problems you may
+  encounter!
+
+ -- Gergely Nagy <algernon@bonehunter.rulez.org>  Sun, 16 Nov 2003 15:28:31 +0100
+
+dpatch (1.23) unstable; urgency=low
+
+  Versions of dpatch up to and including version 1.22 had two
+  developer-accessible methods of telling dpatch what patches to apply;
+  debian/patches/00list, and the variable "$PATCHLIST". The variable
+  $PATCHLIST was always sorted before patches were applied an unapplied, but
+  the list from debian/patches/00list was only sorted when there was also an
+  arch-specific list such as debian/patches/00list.${ARCH}.
+
+  As of this version (1.23), dpatch no longer sorts the patch list, period.
+  The maintainers feel that dpatch's user base is likely full of
+  anal-retentive folk (very much like themselves :) who prefer specifying
+  things in minute detail.
+
+  If your package uses the $PATCHLIST variable to tell dpatch which patches to
+  apply, or if you use debian/patches/00list as well as an arch-specific patch
+  list, you may want to double-check that the patches apply in correct order
+  when they aren't sorted.
+
+ -- David B Harris <david@eelf.ddts.net>  Thu, 31 Jul 2003 06:15:05 -0400

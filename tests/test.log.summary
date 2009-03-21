@@ -1,0 +1,14 @@
+[OK] 01_create_env.sh
+[OK] 02_create_patch.sh
+[OK] 03_edit_patch.sh
+[OK] 04_add_new_patch.sh
+[OK] 05_edit_with_patched.sh
+[OK] 06_dpatch_edit_patch_description.sh
+[OK] 07_dpatch_edit_patch_description_preserve.sh
+[OK] 08_dpatch_list_patch.sh
+[OK] 10_dpep_debianonly.sh
+[OK] 11_dpep_debianonly_origtargz_in_upstream.sh
+[OK] 12_dpatch_with-cpp.sh
+[OK] 13_dpatch-edit-patch-null.sh
+[OK] 14_dpatch_edit_patch_without_DPATCH.sh
+[OK] 15_dpatch_apply_with_error.sh

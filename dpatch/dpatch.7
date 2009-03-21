@@ -1,0 +1,62 @@
+.\" -*- nroff -*-
+.\" This manual is for dpatch, a patch maintenance system for Debian
+.\" 
+.\" Copyright (C) 2003 Gergely Nagy <algernon@bonehunter.rulez.org>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this
+.\" manual into another language, under the above conditions for modified
+.\" versions, except that this permission notice may be stated in a
+.\" translation approved by the Author.
+.TH DPATCH 7 "Dec 15 2003" "DPATCH 2" "dpatch"
+.SH "NAME"
+debian/patches/script.dpatch \- self applying patch
+
+.SH "SYNOPSIS"
+.BI "debian/patches/script.dpatch " "\-patch " [ directory ]
+.br
+.BI "debian/patches/script.dpatch " "\-unpatch " [ directory ]
+.br
+.BI "debian/patches/script.dpatch " \-pkg\- "custom [" directory ]
+
+.SH "DESCRIPTION"
+A \fBdpatch\fR is a program that modifies the source tree in a given
+\fIdirectory\fR. How it does that is entirely up to the person
+writing it. It can be a script that calls \fBpatch\fR(1) with the
+appropriate options, a complicated perl script that does some deep
+magic, or anything else. The only requirement is that it \fBMUST\fR
+accept the \fI\-patch\fR and \fI\-unpatch\fR options, followed by the
+destination (or working) directory, when specified. For the sake of
+compatibility, the second argument is only present when a working
+directory was explicitly set with \fBdpatch \-\-workdir\fR.
+
+For some of the \fBdpatch\fR(1) features to work, the script should
+follow a common style: there should be a line near the top of the file
+with the following format: "\fIfilename\fR \-\- \fIauthor\fR
+<\fIemail\fR>". And one or more "# DP: \fIdescription\fR" lines. These
+will be used by \fBdpatch cat\fR for example.
+
+.SH "EXAMPLES"
+One can find \fBdpatch\fR examples under
+\fI/usr/share/doc/dpatch/examples/\fR.
+
+.SH "AUTHOR"
+This manual page was written by Gergely Nagy.
+
+.SH "SEE ALSO"
+.BR "dpatch" "(1), "
+.BR "dpatch.make" "(7), "
+.BR "dpatch\-edit\-patch" "(1), "
+.BR "dpatch\-list\-patch" "(1), "
+.BR "dpatch\-get\-origtargz" "(1), "
+.BR "dpatch\-convert\-diffgz" "(1)"
+
+.\" arch-tag: 58cb8407-3f7d-4c2c-a4ba-d797dabbb4ef

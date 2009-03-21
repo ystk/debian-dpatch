@@ -1,0 +1,584 @@
+## dpatch_lowlevel.shpp				-*- shell-script -*-
+##
+## Low level patch handling interface for dpatch.
+##
+
+# dpatch_patch_apply <args> <dpatchfile>
+dpatch_patch_apply ()
+{
+	local patch patchdir stamp ext args o_q pwd patchname stampdir wd
+	local redir o_v o_ns
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+	if [ ${DPATCH_WORKDIR} != "./" ]; then
+		wd=${DPATCH_WORKDIR}
+	fi
+	redir=">"
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			--no-stamp)
+				o_ns=1
+				;;
+			--verbose|-v)
+				redir="| tee"
+				o_v=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_apply: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	patchdir=${patchname%/*}
+	test -d ${stampdir} || install -d ${stampdir}
+	test "x${patchdir}" = "x${patchname}" || \
+		install -d ${stampdir}/${patchdir}
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	test -x ${patch} || chmod +x ${patch}
+	if test -f ${stamp} && [ ${DPATCH_OPTION_FORCE} -eq 0 ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} already applied to ${DPATCH_WORKDIR} ."
+		fi
+		if [ ${DPATCH_OPTION_STRICT} -ne 0 ]; then
+			return 1
+		fi
+	else
+		if [ -z "${o_q}" ]; then
+			echo -n "applying patch ${patchname} to ${DPATCH_WORKDIR} ..."
+			if [ ! -z "${o_v}" ]; then
+				echo
+			fi
+		fi
+		if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+			cd ${DPATCH_WORKDIR}
+		fi
+		if eval ${patch} -patch ${wd} ${redir} ${stamp}.new 2>&1; then
+			if [ -z "${o_ns}" ]; then
+				mv ${stamp}.new ${stamp}
+				touch ${stamp}
+			else
+				rm -f ${stamp}.new
+			fi
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " ok."
+				else
+					echo
+				fi
+			fi
+		else
+			if [ -z "${o_ns}" ]; then
+				mv ${stamp}.new ${stamp}.failed
+				{ printf "md5sum: "; md5sum ${patch}; } >> ${stamp}.failed
+				touch ${stamp}.failed
+			else
+				rm -f ${stamp}.new
+			fi
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " failed."
+				else
+					echo
+				fi
+			fi
+			if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+				cd ${pwd}
+			fi
+			return 1
+		fi
+	fi
+
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${pwd}
+	fi
+	return 0
+}
+
+# dpatch_patch_deapply <args> <dpatchfile>
+dpatch_patch_deapply ()
+{
+	local patch stamp ext args o_q pwd patchname stampdir wd
+	local redir o_v
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+	if [ ${DPATCH_WORKDIR} != "./" ]; then
+		wd=${DPATCH_WORKDIR}
+	fi
+	redir=">"
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			--verbose|-v)
+				redir="| tee"
+				o_v=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_deapply: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	test -x ${patch} || chmod +x ${patch}
+	if test -f ${stamp} || [ ${DPATCH_OPTION_FORCE} -ne 0 ]; then
+		if [ -z "${o_q}" ]; then
+			echo -n "reverting patch ${patchname} from ${DPATCH_WORKDIR} ..."
+			if [ ! -z "${o_v}" ]; then
+				echo
+			fi
+		fi
+		if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+			cd ${DPATCH_WORKDIR}
+		fi
+		if eval ${patch} -unpatch ${wd} ${redir} /dev/null 2>&1; then
+			rm -f ${stamp}
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " ok."
+				else
+					echo
+				fi
+			fi
+		else
+			if [ -z "${o_q}" ]; then
+				if [ -z "${o_v}" ]; then
+					echo " failed."
+				else
+					echo
+				fi
+			fi
+			if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+				cd ${pwd}
+			fi
+			return 1
+		fi
+	elif test -f ${stamp}.failed; then
+		if [ -z "${o_q}" ]; then
+			echo "attempting to revert failed patch ${patchname} from ${DPATCH_WORKDIR}:"
+			if [ "$(tail -n1 ${stamp}.failed | grep ^md5sum: | cut -f2- -d" ")" \
+			     = "$(md5sum ${patch})" ]; then
+				echo -n "  md5sums match, proceeding ..."
+			else
+				echo
+				echo "  patch md5sum has changed since failed apply, aborting"
+				echo "  please clean this up manually, by reverting the changes"
+				echo "  and removing debian/patched/${patchname%%.dpatch}.dpatch.failed"
+				return 1
+			fi
+			if [ ! -z "${o_v}" ]; then
+				echo
+			fi
+		fi
+		if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+			cd ${DPATCH_WORKDIR}
+		fi
+		eval ${patch} -unpatch ${wd} ${redir} /dev/null 2>&1 || true
+		rm -f ${stamp}.failed
+		if [ -z "${o_q}" ]; then
+			if [ -z "${o_v}" ]; then
+				echo " done (neither success nor failure guaranteed)"
+			else
+				echo
+			fi
+		fi
+	else
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} not applied to ${DPATCH_WORKDIR} ."
+			if [ ${DPATCH_OPTION_STRICT} -ne 0 ]; then
+				return 1
+			fi
+		fi
+	fi
+
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${pwd}
+	fi
+	return 0
+}
+
+# dpatch_patch_status <args> <dpatchfile>
+dpatch_patch_status ()
+{
+	local patch stamp ext args o_q patchname pwd stampdir
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_status: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	if test -f ${stamp}; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} already applied to ${DPATCH_WORKDIR} ."
+		else
+			return 11
+		fi
+	else
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} not applied to ${DPATCH_WORKDIR} ."
+		fi
+	fi
+
+	return 0
+}
+
+# dpatch_patch_log <args> <dpatchfile>
+dpatch_patch_log ()
+{
+	local patch stamp ext args o_q patchname pwd stampdir
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	stampdir=${DPATCH_WORKDIR}/debian/patched
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--stampdir=*|-s=*)
+				local p
+
+				p=$(echo ${1} | cut -d= -f2-)
+				case $p in
+					/*)
+						stampdir=$p
+						;;
+					*)
+						stampdir=${pwd}/$p
+						;;
+				esac
+				shift
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_log: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	stamp=${stampdir}/${patchname%%.dpatch}.dpatch
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	if test -f ${stamp}; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname}:"
+			sed -e "s,^,| ,g" < ${stamp}
+			echo
+		else
+			cat ${stamp}
+		fi
+	fi
+
+	return 0
+}
+
+# dpatch_patch_custom <args> <dpatchfile>
+dpatch_patch_custom ()
+{
+	local patch ext args o_q o_a pwd patchname wd rv
+
+	pwd=$(pwd)
+	args=$1
+	patchname=$2
+	if [ ${DPATCH_WORKDIR} != "./" ]; then
+		wd=${DPATCH_WORKDIR}
+	fi
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--argument=*|-a=*)
+				o_a=$(echo $1 | cut -d= -f2-)
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_custom: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	if [ -z "${o_a}" ]; then
+		echo "dpatch: No argument supplied for dpatch call!" >&2
+		return 1
+	fi
+
+	test -e ${pwd}/debian/patches/${patchname} || ext=.dpatch
+	patch=${pwd}/debian/patches/${patchname}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patchname} does not exist."
+		fi
+		return 1
+	fi
+
+	test -x ${patch} || chmod +x ${patch}
+
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${DPATCH_WORKDIR}
+	fi
+	if ${patch} -${o_a} ${wd}; then
+		rv=0
+	else
+		rv=1
+	fi
+	if [ ${DPATCH_OPTION_CHDIR} -ne 0 ]; then
+		cd ${pwd}
+	fi
+	return ${rv}
+}
+
+# dpatch_patch_cat <args> <dpatchfile>
+dpatch_patch_cat ()
+{
+	local patch ext author args o_nm o_nd o_a sp o_q
+
+	args=$1
+	patch=$2
+	sp="  "
+
+	set -- ${args}
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--quiet|-q)
+				o_q=1
+				;;
+			--no-meta|-nm|--desc-only|-d)
+				o_nm=1
+				o_a=""
+				;;
+			--author-only|-a)
+				o_a=1
+				o_nd=1
+				;;
+			--no-desc|-nd)
+				o_nd=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_cat: $1" >&2
+				return 1
+				;;
+			*)
+				break;;
+		esac
+		shift || true
+	done
+
+	test -e debian/patches/${patch} || ext=.dpatch
+	patch=debian/patches/${patch}${ext}
+
+	if [ ! -f ${patch} ]; then
+		if [ -z "${o_q}" ]; then
+			echo "${patch} does not exist."
+		fi
+		return 1
+	fi
+
+	author=$(sed -n "s,^#* *.*dpatch by *,,p" ${patch})
+
+	if [ -z "${o_nm}" ] && [ -z "${o_a}" ]; then
+		echo "${patch} (${author}):"
+	else
+		if [ ! -z "${o_a}" ]; then
+			echo ${author}
+			return 0
+		fi
+		sp=""
+	fi
+	if [ -z "${o_nd}" ]; then
+		sed -n "s/^#* *DP: */${sp}/p" ${patch}
+		echo
+	fi
+
+	return 0
+}
+
+# dpatch_patch_list <args> <dpatchfile>
+dpatch_patch_list ()
+{
+	if [ ! -z "${args}" ]; then
+		echo "dpatch: dpatch_patch_list does not take any options." >&2
+		return 1
+	fi
+	echo "${2%.dpatch}"
+	return 0
+}
+
+# dpatch_command_map <command>
+dpatch_command_map ()
+{
+	local cmd_o cmd
+
+	cmd_o=$1
+
+	case ${cmd_o} in
+		call|call-until|call-up-to|call-all)
+			cmd=custom
+			;;
+		patch|apply|patch-until|apply-until|patch-up-to|apply-up-to|patch-all|apply-all)
+			cmd=apply
+			;;
+		unpatch|deapply|unpatch-until|deapply-until|unpatch-up-to|deapply-up-to|unpatch-all|deapply-all)
+			cmd=deapply
+			;;
+		list|list-all|list-up-to|list-until)
+			cmd=list
+			;;
+		cat|cat-all|cat-up-to|cat-until)
+			cmd=cat
+			;;
+		status|status-all|status-up-to|status-until)
+			cmd=status
+			;;
+		log|log-all|log-up-to|log-until)
+			cmd=log
+			;;
+		patch-template)
+			cmd=patch_template
+			;;
+		help|--help|-h)
+			cmd=help
+			;;
+		version|--version|-V)
+			cmd=version
+			;;
+		*)
+			cmd=UNKNOWN
+			;;
+	esac
+
+	echo ${cmd}
+}
+
+## arch-tag: 841ef943-8c27-4094-a413-576f76c2b8f9
