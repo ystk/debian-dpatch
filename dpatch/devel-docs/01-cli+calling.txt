@@ -1,0 +1,86 @@
+CLI parsing and calling conventions in dpatch
+=============================================
+
+Probably the most scary part of dpatch is the CLI parser. It is scary
+and complex since it involves quite a few parts of the code, and is
+spread over almost every single function.
+
+There are four parts of every single command line call: global
+options, command, command options and command arguments. They must be
+given in this order, options and arguments do not mix. Also, to keep
+the parser simple and distributed (more on this later) options and
+their value must be passed to dpatch as a single positional parameter.
+
+Now, lets step closer to the code and inspect the call chain! First,
+dpatch tries to find all the global options, and set the appropriate
+variables based on them. As soon as it finds a non-option, it exits
+the loop. And this is where things get interesting! To understand what
+is going on and why, let me explain some calling conventions (that is,
+a life of a command call)!
+
+All commands that deal with patches have a low-level primitive in
+dpatch_lowlevel.shpp. This primitive implements the command for one
+and only one patch. It has no idea of patch sequences or
+whatnot. Though, this one handles the command-specific options.
+
+Then, there is the main entry point, dpatch_patchset_do in
+dpatch_patchset.shpp, which feeds the options it received and one by
+one, each patch in a sequence to the appropriate low-level function.
+
+Now, lets get back to a higher level, where dpatch just finished
+parsing the global options. The next element is assumed to be the name
+of the command, so dpatch calls a mapping function that maps known
+commands to the appropriate low-level handler. Note that `foo',
+`foo-until' and `foo-all' are all handled by dpatch_patchset_do and
+dpatch_patch_foo! The only difference is the number of arguments
+accepted and the way the patch sequence is constructed from them. To
+ease our job, before calling dpatch_patchset_do, we save all the
+command-specific options, and count the remaining arguments, and
+scream if they are not in the allowed range.
+
+To make things clear, let us look at an example! Lets suppose we
+issued a `dpatch --workdir=/foo patch --quiet 01 02 03' command!
+
+First, dpatch notices the --workdir option, and acts
+appropriately. Then notices that "patch" is not an option, so it
+quits parsing command-line options. The first positional parameter
+("patch", as global options were already shifted away) is the command
+name. Good! Now lets save the command options, in this case,
+"--quiet". Then, check if we have arguments in the allowed range,
+which we do, as `patch' takes at least one argument, and has no upper
+limit. So, we call dpatch_patchset_do, telling it that we want to use
+the lowlevel function for `patch', pass the command options as a
+single string, tell the function that it should not modify the
+patch sequence, and finally supply the list too. From this point on,
+dpatch_patchset_do's job is straightforward.
+
+For a slightly different case, lets look at what happens if we issue
+the `dpatch --workdir=/foo patch-until 04' command! Up to the point
+where we count the command arguments, we are on the same code path. We
+even have the right number of arguments. However, now we ask
+dpatch_patchset_do to do modify the patch sequence for us. There is an
+assumption in dpatch_patchset_do that must be mentioned here. There
+are four ways a patch sequence can be handled:
+
+ * When one patch was supplied and patch sequence modification was not
+   permitted, the sequence is left intact (`patch' with a single
+   argument).
+ * When one patch was supplied and patch sequence modification is
+   needed, the list of patches is determined, and all patches after
+   the specified one are deleted from the list (`patch-until' case).
+ * When multiple patches were supplied, the sequence is left intact
+   (`patch' with multiple arguments).
+ * When no patches were supplied, we treat this case as if all
+   available patches were supplied (`patch-all' case).
+
+Well, that was it for starters. I hope I could shed some light on the
+mysteries of dpatch internals. However, I will summarise what we
+learned in this session: Low-level routines are never ever called
+directly. All interaction with them goes through dpatch_patchset_do
+which sanitises the patch sequence, and passes each patch individually
+to the low-level functions. Options are also parsed in a similar
+fashion, at different levels in the call hierarchy.
+
+In our next lesson, I will talk about coding style. Maybe. 
+
+# arch-tag: e04983df-1399-4e03-bbd9-0a6579e16fee

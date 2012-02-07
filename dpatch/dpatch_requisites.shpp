@@ -1,0 +1,22 @@
+## dpatch_requisites.shpp				-*- shell-script -*-
+##
+## Sanity checks for dpatch
+##
+
+# dpatch_requisites
+dpatch_requisites()
+{
+	local DPATCH_REQUISITES_FAILED
+
+	if [ "$DPATCH_OPTION_CPP" = 1 ]; then
+		if [ ! -x /usr/bin/cpp ]; then
+			echo "dpatch: /usr/bin/cpp not found, aborting!" >&2
+			echo " (consider installing the cpp package)" >&2
+			DPATCH_REQUISITES_FAILED=1
+		fi
+	fi
+
+	return $DPATCH_REQUISITES_FAILED
+}
+
+## arch-tag: 438d1388-ff63-442e-9b70-67ef4d2b47a7

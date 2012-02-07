@@ -1,0 +1,6 @@
+   create environment for dpatch testing.
+   the environment is used in the following tests.
+  
+   $TESTDIR/dpatch-test ($PKGPATH) is the debian package directory, 
+   and "dpatch-test" is the package name.
+

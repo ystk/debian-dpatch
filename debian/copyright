@@ -1,0 +1,73 @@
+Format: http://anonscm.debian.org/viewvc/dep/web/deps/dep5.mdwn?revision=174&view=co&pathrev=174
+Upstream-Name: dpatch
+Upstream-Contact: Gergely Nagy <algernon@madhouse-project.org>
+Source: git://git.madhouse-project.org/debian/dpatch.git
+Copyright: Copyright (C) 2002-2011
+  Gergely Nagy, Joerg Jaspert, David B Harris, Junichi Uekawa and others
+License: GPL-2+
+
+Files: *
+Copyright: Copyright (C) 2002-2011
+  Gergely Nagy, Joerg Jaspert, David B Harris, Junichi Uekawa and others
+License: GPL-2+
+
+Files: tools/shpp.awk
+Copyright: Copyright (C) 2003 Miles Bader <miles@gnu.org>
+License: GPL-2+
+
+Files: scripts/dpatch-convert-diffgz
+Copyright: Copyright (C) 2003 Junichi Uekawa
+License: GPL-2+
+
+Files: compat/dpatch.make.7
+Copyright: Copyright (C) 2003 Gergely Nagy <algernon@bonehunter.rulez.org>
+ Copyright (C) 2007 Junichi Uekawa <dancer@debian.org>
+License:
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+ .
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one.
+ .
+ Permission is granted to copy and distribute translations of this
+ manual into another language, under the above conditions for modified
+ versions, except that this permission notice may be stated in a
+ translation approved by the Author.
+
+Files: dpatch/dpatch.1 dpatch/dpatch.7
+Copyright: Copyright (C) 2003-2011 Gergely Nagy <algernon@bonehunter.rulez.org>
+License:
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+ .
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one.
+ .
+ Permission is granted to copy and distribute translations of this
+ manual into another language, under the above conditions for modified
+ versions, except that this permission notice may be stated in a
+ translation approved by the Author.
+
+License: GPL-2+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License
+ along with this package; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL-2'.

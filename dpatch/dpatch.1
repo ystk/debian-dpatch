@@ -1,0 +1,503 @@
+.\" -*- nroff -*-
+.\" This manual is for dpatch, a patch maintenance system for Debian
+.\" 
+.\" Copyright (C) 2003, 2004, 2005 Gergely Nagy <algernon@bonehunter.rulez.org>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this
+.\" manual into another language, under the above conditions for modified
+.\" versions, except that this permission notice may be stated in a
+.\" translation approved by the Author.
+.TH DPATCH 1 "Dec 13 2011" "DPATCH 2" "dpatch"
+.SH "NAME"
+dpatch \- patch maintenance system for Debian
+
+.SH "SYNOPSIS"
+.BI "dpatch [" options ] " command " [ command\-arguments ]
+
+.SH "DESCRIPTION"
+\fBdpatch\fR is an easy to use patch system for Debian packages,
+somewhat similar to the dbs package, but much simpler to use.
+
+It lets you store patches and other simple customization templates in
+\fIdebian/patches\fR and otherwise does not require much reorganization of
+your source tree. To get the patches applied at build time you simply
+need to include a makefile snippet and then depend on the
+\fBpatch/unpatch\fR target in the \fBbuild\fR or \fBclean\fR stage of
+\fIdebian/rules\fR. For added flexibility, you can call
+\fI/usr/bin/dpatch\fR directly too.
+
+.SH WARNING
+.B dpatch
+is deprecated, please switch to the `3.0 (quilt)' Debian source
+package format instead. See
+.I http://wiki.debian.org/Projects/DebSrc3.0#FAQ
+for a short guide on how to do it.
+
+.SH "GLOBAL OPTIONS"
+There are a few options which change the overall behaviour of dpatch,
+and have an effect on not only one, but most of the available
+commands.
+
+These global options are:
+.TP
+.BI "\-\-workdir (\-d) " DIRECTORY
+By default, dpatch applies patches to the source tree it was run
+from. With this option, one can change that, and tell dpatch to work
+on a different tree, although taking the dpatches from the current
+one.
+
+Note that this will only pass a second argument to dpatch scriptlets,
+and will not change to the specified directory. To do that, use the
+\fB\-\-chdir\fR option explained below.
+.TP
+.B \-\-chdir (\-c)
+When using a different working directory than the current one, change
+there before trying to apply patches.
+
+This should be used together with the \fB\-\-workdir\fR option.
+.TP
+.B \-\-strict (\-S)
+Enable strict mode, which means that dpatch will bail out early even
+on warnings (like when trying to apply a patch which is already
+applied - normally it will simply skip it).
+.TP
+.B \-\-force (\-F)
+Force the application or deapplication of patches, even if dpatch
+would normally skip them because the operation was already done
+earlier.
+
+.TP
+.B \-\-with\-cpp
+Force the use of cpp. Overrides use of 
+.B "DPATCH_OPTION_CPP=1" 
+option in
+.I "debian/patches/00options"
+file.
+
+.SH "COMMANDS"
+.SS "Patch handling commands"
+There is a generic syntax for all patch handling commands, namely
+that, that the command itself takes a list of dpatch names to work
+with, then does what it is meant to do on all of them, in the exact
+same order it was specified on the command line.
+
+Then, there is a version of each patch handling command with an
+\fB\-all\fR suffix, which does not take any arguments, and performs
+the necessary action for each and every available dpatch.
+
+The last variation is a command with a \fB\-until\fR or \fB\-up\-to\fR
+suffix, which takes only one argument: the name of a dpatch. The
+appropriate action will be performed on all dpatches up to and
+including this specified one.
+
+.P
+.BI "apply [" options ]
+.br
+.BI "patch [" options ]
+.RS
+Applies one or more dpatches to the working tree (the current
+directory, if not told otherwise). By default the specified patches
+will be applied in the exact same order they were specified.
+
+.B Options
+.RS
+.BI \-\-stampdir= directory ", \-s=" directory
+.RS
+Put stamp files into \fIdirectory\fR instead of the default
+\fIdebian/patched\fR.
+.RE
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.B \-\-quiet (\-q)
+.RS
+Forces the command to not print anything.
+.RE
+.B \-\-verbose (\-v)
+.RS
+Disables hiding of the scriptlet output.
+.RE
+.RE
+.RE
+
+.P
+.BI "deapply [" options ]
+.br
+.BI "unpatch [" options ]
+.RS
+Deapplies one or more dpatches to the working tree (the current
+directory, if not told otherwise). By default the specified patches
+will be deapplied in the reverse order they were specified as one
+generally should deapply in reverse order (compared to the apply
+order, that is).
+
+.B Options
+.RS
+.BI \-\-stampdir= directory ", \-s=" directory
+.RS
+Use stamp files in \fIdirectory\fR instead of the default
+\fIdebian/patched\fR.
+.RE
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.B \-\-quiet (\-q)
+.RS
+Forces the command to not print anything.
+.RE
+.B \-\-verbose (\-v)
+.RS
+Disables hiding of the scriptlet output.
+.RE
+.RE
+.RE
+
+.TP
+.BI "cat [" options ]
+Print meta-\information about a dpatch, such as its name, author and
+description (any of which can be disabled with the appropriate
+option).
+
+.RS
+.B Options
+.RS
+.B \-\-no\-meta, \-\-desc-only (\-nm, \-d)
+.RS
+Only print the patch description.
+.RE
+.B \-\-author\-only (\-a)
+.RS
+Only print the author of the patch.
+.RE
+.B \-\-no\-desc, (\-nd)
+.RS
+Do not print the patch description.
+.RE
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.B \-\-quiet (\-q)
+.RS
+Forces the command to not print anything.
+.RE
+.RE
+.RE
+
+.TP
+.BI "list [" options ]
+List the name of the given patches. This commands is not really
+useful, except the \fBlist\-all\fR variant, which lists all available
+patches.
+
+.RS
+.B Options
+.RS
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.RE
+.RE
+
+.TP
+.BI "status [" options ]
+Prints the status of the given patches - whether they are applied to
+the working tree or not.
+
+.RS
+.B Options
+.RS
+.BI \-\-stampdir= directory ", \-s=" directory
+.RS
+Use stamp files in \fIdirectory\fR instead of the default
+\fIdebian/patched\fR.
+.RE
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.B \-\-quiet (\-q)
+.RS
+Forces the command to not print anything.
+.RE
+.RE
+.RE
+
+.TP
+.BI "log [" options ]
+Displays the log of the given patching attempts.
+
+.RS
+.B Options
+.RS
+.BI \-\-stampdir= directory ", \-s=" directory
+.RS
+Use stamp files in \fIdirectory\fR instead of the default
+\fIdebian/patched\fR.
+.RE
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.B \-\-quiet (\-q)
+.RS
+Forces the command to not print anything, but the logs without extra
+sugar on top.
+.RE
+.RE
+.RE
+
+.TP
+.BI "call [" options ]
+Call a dpatch with a user\-specified argument. All arguments with a
+\fBpkg\-\fR prefix is guaranteed to be unused by dpatch itself, and
+are reserved for use with this very command.
+
+This command is most useful for extracting custom meta\-information
+from dpatch scriptlets.
+
+.RS
+.B Options
+.RS
+.BI \-\-argument= "arg " (\-a= arg)
+.RS
+Call patches with \fIarg\fR as argument.
+.RE
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.B \-\-quiet (\-q)
+.RS
+Forces the command to not print anything.
+.RE
+.RE
+.RE
+
+.SS "Miscellaneous commands"
+.TP
+.BI "patch\-template [" options "] [" patchname "] [" description ]
+Print a quasi\-standard dpatch script template, based on the
+information give on the command\-line. If a \fIdescription\fR given,
+it will be folded at about 72 characters into multiple lines
+appropriately.
+
+When prepending the template to STDIN, the contents of the standard input
+will be printed right after the template.
+
+.RS
+.B Options
+.RS
+.B \-\-prepend (\-p)
+.RS
+Prepend the template to STDIN.
+.RE
+.B \-\-help (\-h)
+.RS
+Print a short help message about the command.
+.RE
+.RE
+.RE
+
+.TP
+.BI "help (\-\-help, \-h) [" command ]
+Attempt to give a little more detailed help about dpatch itself, or
+about a given dpatch command.
+.TP
+.B version
+Prints the dpatch version number and exits.
+
+.SH "DPATCH IN DEBIAN PACKAGES"
+There are two different ways to use dpatch in \fIdebian/rules\fR:
+calling it directly, or including \fBdpatch.make\fR(7). Only the
+former method will be described here \- the latter has its own manual
+page.
+
+\fINOTE\fR: The following examples also require adding the
+\fB.NOTPARALLEL\fR flag to the head of \fIdebian/rules\fR since the
+dependency lists rely on the order of the
+execution. Without \fB.NOTPARALLEL\fR, they execution order may be wrong
+with multiple make threads (the \fI-j\fR option).
+
+In most situations, one will want to run dpatch as soon during the
+build process, as possible. How that can be accomplished depends
+heavily on the existing \fIdebian/rules\fR. However, in common
+practice most packages have a \fBbuild\fR (or \fBbuild\-stamp\fR),
+\fBconfig.status\fR, or \fBconfigure\fR (or \fBconfigure\-stamp\fR)
+target. The easiest way to make dpatching the very first thing, one
+only has to write a rule that calls dpatch, and add it to the list of
+prerequisites for the appropriate target (see above).
+
+Deapplying dpatches can be easy or a bit more tricky. If nothing in
+the \fBclean\fR rule touches files modified by dpatches (creating
+incompatible changes), you can safely add \fBunpatch\fR to the list of
+the \fBclean\fR rules dependencies.
+
+If the patches might affect the build system, they should be deapplied after
+the source tree has been cleaned. To do this, rename the \fBclean\fR target to,
+say, \fBclean\-patched\fR, write a rule that calls dpatch to deapply the
+dpatches, and make a new \fBclean\fR rule that has \fBclean\-patched\fR and
+\fBunpatch\fR as its prerequisites.
+
+Let us look at an example! First, let us look at the relevant parts of
+the original \fIdebian/rules\fR of our imaginary package:
+
+.RS
+.sp
+.nf
+config.status: configure
+	./configure \-\-prefix=/usr \-\-mandir=/usr/share
+build: config.status
+	${MAKE}
+clean:
+	$(testdir)
+	$(testroot)
+	${MAKE} distclean
+	rm \-rf debian/imaginary\-package debian/files debian/substvars
+.fi
+.sp
+.RE
+
+After dpatchifying, this would look like this:
+
+.RS
+.sp
+.nf
+config.status: patch configure
+	./configure \-\-prefix=/usr \-\-mandir=/usr/share
+build: config.status
+	${MAKE}
+clean: clean\-patched unpatch
+clean\-patched:
+	$(testdir)
+	$(testroot)
+	${MAKE} distclean
+	rm \-rf debian/imaginary\-package debian/files debian/substvars
+
+patch: patch\-stamp
+patch\-stamp:
+	dpatch apply\-all
+	dpatch cat\-all >patch\-stamp
+
+unpatch:
+	dpatch deapply\-all
+	rm \-rf patch\-stamp debian/patched
+.fi
+.sp
+.RE
+
+.SS "Adding dpatch scriptlets to a package"
+When using dpatch, one surely wants to tell the system what dpatches
+to apply, and which ones to discard. In the most common situation, one
+only needs to list the names of the dpatches (the filenames relative
+to \fIdebian/patches\fR) in \fIdebian/patches/00list\fR.
+They usually have the extension 
+.B ".dpatch"
+and the extension can be omitted, thus a file 
+.B "debian/patches/01_one_patch.dpatch"
+is written as 
+.B "01_one_patch"
+inside
+.B "debian/patches/00list"
+
+However, there may be situations where something more flexible is
+needed, like applying the same patch on only two architectures, say,
+\fBm68k\fR and \fBpowerpc\fR. One solve this in at least two very
+different ways: One is to list the same patch in both
+\fIdebian/patches/00list.m68k\fR and
+\fIdebian/patches/00list.powerpc\fR, the other is to use
+\fBDPATCH_OPTION_CPP=1\fR in \fIdebian/patches/00options\fR.
+00list file is passed through
+.B cpp
+command with 
+.B DEB_BUILD_ARCH
+variable set to the architecture,
+and 
+.BI "DEB_BUILD_ARCH_" "architecture"
+being set to 1.
+With cpp, our sample \fIdebian/patches/00list\fR might look
+like this:
+
+.RS
+.sp
+.nf
+01_manpage_typo
+#if defined(DEB_BUILD_ARCH_m68k) || defined(DEB_BUILD_ARCH_powerpc)
+/* This patch fixes a random build\-time breakage on Macintosh boxen. */
+02_macintosh_foo
+#endif
+.fi
+
+.SS "Creating dpatch scriptlets"
+There are many ways to create dpatch scriptlets. They are simple,
+executable files, which follow a standardised calling convention
+(documented in \fBdpatch\fR(7)).
+
+You can fire up your $EDITOR, or use \fBdpatch\-edit\-patch\fR, and
+you should be all set.
+
+For most cases, where the dpatch file is only to apply a simple
+patch, there is an even easier way:
+
+.RS
+.sp
+.nf
+dpatch patch\-template \-p "01_some_patch" "A random patch" \\
+	<random.diff >debian/patches/01_some_patch.dpatch
+.fi
+.sp
+.RE
+
+
+.SH "FILES"
+.TP
+.I debian/patches/00list
+.RS
+The list of patches to apply, deapply, or otherwise fiddle with.
+.RE
+.TP
+.I debian/patches/00list.\fBarch\fI
+.RS
+List of patches to work with - additionally to the common list in
+\fIdebian/patches/00list\fR -, when building on the \fBarch\fR
+architecture.
+.RE
+.TP
+.I /etc/dpatch.conf
+.RS
+System-wide configuration file for dpatch, for setting global options
+permanently.
+.RE
+.TP
+.I ~/.dpatch.conf
+.RS
+Per-user configuration file, for setting global options permanently.
+.RE
+
+.SH "AUTHORS"
+.B dpatch
+was written by Joerg Jaspert, David B Harris, Gergely Nagy, Junichi
+Uekawa and others.
+
+This manual page was written by Gergely Nagy, and updated by Junichi Uekawa
+
+.SH "SEE ALSO"
+.BR "dpatch" "(7), "
+.BR "dpatch.make" "(7), "
+.BR "dpatch\-edit\-patch" "(1), "
+.BR "dpatch\-list\-patch" "(1), "
+.BR "dpatch\-convert\-diffgz" "(1)"
+
+.\" arch-tag: a45571c1-b231-43cd-8fe5-00be30315328

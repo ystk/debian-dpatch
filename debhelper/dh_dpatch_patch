@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dh_dpatch_patch - apply patches listed in debian/patches/00list
+
+=cut
+
+use strict;
+use Debian::Debhelper::Dh_Lib;
+
+=head1 SYNOPSIS
+
+B<dh_dpatch_patch> [S<I<debhelper options>>]
+
+=head1 DESCRIPTION
+
+dh_dpatch_patch simply calls B<dpatch apply-all> .
+All patches listed in B<debian/patches/00list> are then applied in the
+current directory. The command does not fail if the patches have
+already been applied.
+
+=head1 EXAMPLES
+
+dh_dpatch_patch is usually called indirectly in a rules file via the
+dh command.
+
+	%:
+		dh --with dpatch $@
+
+It can also be direcly called at the start of the build (or configure)
+rule.
+
+	build:
+		dh_dpatch_patch
+		./configure
+		$(MAKE)
+
+=cut
+
+init();
+
+complex_doit('dpatch apply-all || test $? = 2');
+
+=head1 SEE ALSO
+
+L<debhelper(7)>, L<dh(1)>.
+
+This program is meant to be used together with debhelper.
+
+=head1 AUTHOR
+
+Hideki Yamane <henrich@debian.or.jp>, stolen from dh_dpatch_quilt written by Raphael Hertzog <hertzog@debian.org>
+
+=cut
+

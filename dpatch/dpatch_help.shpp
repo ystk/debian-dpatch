@@ -1,0 +1,316 @@
+## dpatch_help.shpp				-*- shell-script -*-
+##
+## Help messages for dpatch.
+
+dpatch_help_apply="dpatch apply -- apply the given patches
+
+Usage: dpatch apply [<options>] <patches>
+       dpatch apply-all [<options>]
+       dpatch apply-until [<options>] <patch>
+
+Aliases: apply, patch
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Put stamps into <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+  --verbose, -v		Disables hiding of the scriptlet output.
+
+Applies one or more \`dpatches' to the working tree (the current
+directory, if not told otherwise). By default the specified patches
+will be applied in the exact same order they were specified.
+
+Calling \`apply-all' applies all available \`dpatches'.
+
+Using \`apply-until' makes it possible to apply all patches up to, and
+including the specified one."
+
+dpatch_help_deapply="dpatch deapply -- deapply the given patches
+
+Usage: dpatch deapply [<options>] <patches>
+       dpatch deapply-all [<options>]
+       dpatch deapply-until [<options>] <patch>
+
+Aliases: deapply, unpatch
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Use the stamps in <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+  --verbose, -v		Disables hiding of the scriptlet output.
+
+Deapplies one or more \`dpatches' to the working tree (the current
+directory, if not told otherwise). By default the specified patches
+will be deapplied in the exact same order they were specified. Pay
+attention to this order: you generally should deapply in reverse order
+(compared to the apply order, that is)!
+
+Calling \`deapply-all' deapplies all available \`dpatches'.
+
+Using \`deapply-until' makes it possible to deapply all patches up to,
+and including the specified one. Note that this works on a patch list
+whose order is reversed, take that into account when using this
+command."
+
+dpatch_help_custom="dpatch call -- call dpatches with a given argument
+
+Usage: dpatch call --argument=<arg> <patches>
+       dpatch call-all --argument=<arg>
+       dpatch call-until --argument=<arg> <patch>
+
+Options:
+  --argument=<arg>,
+          -a=<arg>	Call patches with <arg> as argument.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+
+Call a \`dpatch' with a user-specified argument. All arguments with a
+\`pkg-' prefix is guaranteed to be unused by dpatch itself, and are
+reserved for use with this very command.
+
+The \`call-all' command will run each and every available \`dpatch'
+with the specified argument. Using \`call-until' will do the same, but
+only up to, and including the specified patch."
+
+dpatch_help_status="dpatch status -- print the status of the given patches
+
+Usage: dpatch status [<options>] <patches>
+       dpatch status-all [<options>]
+       dpatch status-until [<options>] <patch>
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Use the stamps in <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+
+The \`status' command prints the status of the given patches - whether
+they are applied to the working tree or not.
+
+Use the \`status-all' command to get the status of all available
+patches, and \`status-until' to get the status of all patches up to
+and including the specified one."
+
+dpatch_help_log="dpatch log -- print the log of a given patching attempt
+
+Usage: dpatch log [<options>] <patches>
+       dpatch log-all [<options>]
+       dpatch log-until [<options>] <patch>
+
+Options:
+  --stampdir=<dir>,
+          -s=<dir>	Use the stamps in <dir> instead of debian/patched.
+  --quiet, -q		Do not print anything, only the logs themselves.
+  --help, -h		This help message.
+
+The \`log' command displays the output of a patching attempt (that is, the
+result of a dpatch apply). It is almost similar to \`cat debian/patched/foo'.
+
+Use the \`log-all' command to view the output of all patching attempts, and
+\`log-until' to view the output of attempts up to and including the specified
+one."
+
+dpatch_help_list="dpatch list -- list patches
+
+Usage: dpatch list <patches>
+       dpatch list-all
+       dpatch list-until <patch>
+
+This command does not take any options (except --help, of course).
+
+List the name of the given patches. These commands are not really
+useful, except \`list-all', which lists all available patches."
+
+dpatch_help_cat="dpatch cat -- get patch meta-information
+
+Usage: dpatch cat [<options>] <patches>
+       dpatch cat-all [<options>]
+       dpatch cat-until [<options>] <patches>
+
+Options:
+  --no-meta, -nm,
+  --desc-only, -d	Only print the patch description.
+  --author-only, -a	Only print the author of the patch.
+  --no-desc, -nd	Do not print the patch description.
+  --quiet, -q		Do not print anything.
+  --help, -h		This help message.
+
+Print meta-information about a \`dpatch', such as its name, author and
+description (any of which can be disabled with the appropriate
+option).
+
+The \`cat-all' command prints the meta-information for all available
+patches, while \`cat-until' prints them only up to and including the
+specified patch."
+
+dpatch_help_patch_template="dpatch patch-template -- generate a template dpatch
+
+Usage: dpatch patch-template [<options>] [<patchname>] [<description>]
+
+Options:
+  --prepend, -p		Prepend the template to STDIN.
+  --help, -h		This help message.
+
+Print a quasi-standard \`dpatch\ script template, based on the
+information give on the command-line.
+
+When prepending the template to STDIN, the contents of the standard input
+will be printed right after the template."
+
+dpatch_help_help="dpatch help -- offer some help
+
+Usage: dpatch help [<command>]
+
+Attempt to give a little more detailed help about dpatch itself, or
+about a given dpatch command."
+
+dpatch_help_version="dpatch version -- print dpatch version number.
+
+Usage: dpatch version
+
+Prints the dpatch version number and exits."
+
+dpatch_help_UNKNOWN="Unknown command: \`$2'
+
+If this command is documented somewhere, please file a bug. Otherwise
+check if you made a typo, or something. :)"
+
+dpatch_help ()
+{
+	cat <<EOF
+dpatch -- Debian Patching Thingy
+
+Usage: dpatch [<global options>] <command> [<options>] [<patchset>]
+
+Global Options:
+  --workdir, -d <dir>	Do everything in the given directory.
+  --strict, -S		Work in strict mode, exiting on warnings too.
+  --force, -F		Force applying or deapplying a patch.
+
+Commands:
+  apply (apply-all, apply-until)
+    Apply the given set of patches, all of them, or up to, and including
+    the specified one.
+
+  deapply (deapply-all, deapply-until)
+    Deapply a given set of patches, all of them, or up to, and including
+    the specified one.
+
+  call (call-all, call-until)
+    Call a given set of patches with a custom argument, all of them, or
+    up to, and including the specified one.
+
+  cat (cat-all, cat-until)
+    Show the meta-information of a given set of patches, all of them, or
+    up to, and including the specified one.
+
+  list (list-all, list-until)
+    List the name of a given set of patches, all of them, or up to and
+    including the specified one.
+
+  status (status-all, status-up-to)
+    Show the status (applied or not) of a given set of patches, all of them,
+    or up to and including the specified one.
+
+  log (log-all, log-up-to)
+    Display the log of the patch attempt, all attempts, or up to and including
+    the specified one.
+
+  patch-template
+    Generate a quasi-standard dpatch template.
+
+  help
+    This help screen.
+
+  version
+    Print version number and exit.
+
+You can get more information about the various commands by issuing one of the
+	dpatch <command> --help   OR   dpatch help <command>
+commands.
+EOF
+}
+
+# dpatch_help_cmd <command>
+dpatch_help_cmd ()
+{
+	local cmd
+
+	cmd=$(dpatch_command_map $1)
+
+	if eval [ ! -z \"\$dpatch_help_${cmd}\" ]; then
+		eval echo \"\$dpatch_help_${cmd}\"
+		if [ "${cmd}" = "UNKNOWN" ]; then
+			return 1
+		fi
+		return 0
+	else
+		echo "dpatch: There is no help for \`${cmd}' yet." >&2
+		return 1
+	fi
+}
+
+# dpatch_help_do [<command>]
+dpatch_help_do ()
+{
+	if [ ! -z "$1" ]; then
+		dpatch_help_cmd $1
+		return $?
+	else
+		dpatch_help
+		return 0
+	fi
+}
+
+dpatch_version()
+{
+	local \
+#:local-var DPATCH_REVISION
+
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				dpatch_help_do version
+				return $?
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_version: $1" >&2
+				return 1
+				;;
+		esac
+		shift || true
+	done
+
+	cat <<EOF
+dpatch ${DPATCH_REVISION}
+EOF
+
+	return 0
+}
+
+dpatch_license ()
+{
+	dpatch_version
+	cat <<EOF
+Copyright (C) 2002, 2003, 2004
+	Gergely Nagy, Joerg Jaspert, David B Harris and others.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+EOF
+}
+
+## arch-tag: 836be8a6-290f-45a1-bb2b-4f410f350bdf

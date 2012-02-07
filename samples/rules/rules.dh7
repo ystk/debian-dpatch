@@ -1,0 +1,7 @@
+#! /usr/bin/make -f
+##
+## Sample dpatch rules file, to be used with debhelper >= 7, and
+## dpatch >= 2.0.32.
+
+%:
+	dh $@ --with dpatch

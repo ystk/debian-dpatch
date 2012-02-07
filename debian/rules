@@ -1,0 +1,83 @@
+#!/usr/bin/make -f
+# Gergely loves debhelper less - lets do it without debhelper then :)
+
+DPATCH		= ${CURDIR}/debian/dpatch
+MAN1DIR		= ${DPATCH}/usr/share/man/man1
+MAN7DIR		= ${DPATCH}/usr/share/man/man7
+DOCDIR		= ${DPATCH}/usr/share/doc/dpatch
+EXDIR		= ${DOCDIR}/examples
+
+DOCS		= README.History README.source README.svn-mergeWithUpstream
+
+build-dpatch:
+	test -e debian/control
+	${MAKE}
+# add addon for debhelper7
+	pod2man -c Debhelper debhelper/dh_dpatch_patch debian/dh_dpatch_patch.1
+	pod2man -c Debhelper debhelper/dh_dpatch_unpatch debian/dh_dpatch_unpatch.1
+
+build-arch: ;
+build-indep: build-dpatch
+build: build-arch build-indep
+
+testroot:
+	test -e debian/control && test xroot = x`whoami`
+
+clean: testroot
+	${MAKE} clean
+	rm -rf debian/files* ${DPATCH}
+	rm -f debian/dh_dpatch_patch.1 debian/dh_dpatch_unpatch.1
+
+# General compresser rule
+${DOCDIR}/%.gz: docs/%
+	gzip -9fc $< >$@
+
+# Install directories
+installdirs:
+	install -d ${DPATCH}/usr/bin \
+		   ${DPATCH}/DEBIAN \
+		   ${EXDIR} ${MAN1DIR} ${MAN7DIR} \
+		   ${DPATCH}/etc/bash_completion.d \
+		   ${DPATCH}/usr/share/perl5/Debian/Debhelper/Sequence
+
+# Install everything, save DEBIAN/ and stuff from debian/
+install: build installdirs \
+	 $(addsuffix .gz,$(addprefix ${DOCDIR}/,${DOCS}))
+# dpatch itself
+	${MAKE} install DESTDIR=${DPATCH}
+# history
+	cp -r history ${DOCDIR}/
+# install dh7 addons
+	install -m0644 debhelper/dpatch.pm ${DPATCH}/usr/share/perl5/Debian/Debhelper/Sequence/
+	install -m0644 debian/dh_dpatch_patch.1 ${MAN1DIR}
+	install -m0644 debian/dh_dpatch_unpatch.1 ${MAN1DIR}
+	install -m0755 debhelper/dh_dpatch_* ${DPATCH}/usr/bin/
+# Compress stuff
+	find ${MAN1DIR} -type f -not -name '*.gz' | xargs gzip -9f
+	find ${MAN7DIR} -type f -not -name '*.gz' | xargs gzip -9f
+	find ${EXDIR} -type f -not -name '*.gz' | xargs gzip -9f
+	find ${DOCDIR}/history -type d -name '.arch-ids' | xargs rm -rf
+	find ${DOCDIR}/history -type f -not -name '*.gz' | xargs gzip -9f
+
+# Install the whole thing, including DEBIAN/ and stuff from debian/
+binary-dpatch: testroot install
+	gzip -9fc debian/NEWS >${DOCDIR}/NEWS.Debian.gz
+	gzip -9fc debian/changelog >${DOCDIR}/changelog.gz
+	install -m 0644 debian/copyright ${DOCDIR}/copyright
+	cd ${DPATCH} >/dev/null ;\
+	  find etc -type f -printf "/%p\n" >DEBIAN/conffiles
+	cd ${DPATCH} >/dev/null; \
+	  find * -type f ! -regex '^DEBIAN/.*' -print0 | \
+		xargs -r0 md5sum > DEBIAN/md5sums
+	find ${DPATCH} -type f -name '*.gz' | xargs chmod 0644
+	find ${DPATCH}/DEBIAN -type f | xargs chmod 0644
+	dpkg-gencontrol -isp -P${DPATCH}
+	dpkg --build ${DPATCH} ..
+
+binary-indep: binary-dpatch
+binary-arch: ;
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary installdirs install \
+	binary-dpatch testroot
+
+# arch-tag: bb474018-43b6-4bc2-91bc-6d0129cd7639

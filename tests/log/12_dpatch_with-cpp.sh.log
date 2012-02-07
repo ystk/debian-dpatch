@@ -1,0 +1,12 @@
+   check --with-cpp functionality.
+
+=== change 00list
+debian/patches/01_edpatch.dpatch (Gergely Nagy <algernon@madhouse-project.org>):
+  No description.
+
+debian/patches/02_another.dpatch (Gergely Nagy <algernon@madhouse-project.org>):
+  No description.
+
+debian/patches/01_edpatch.dpatch (Gergely Nagy <algernon@madhouse-project.org>):
+debian/patches/02_another.dpatch (Gergely Nagy <algernon@madhouse-project.org>):
+=== put back 00list as it was

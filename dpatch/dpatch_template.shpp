@@ -1,0 +1,55 @@
+## dpatch_template.shpp				-*- shell-script -*-
+##
+## Template handling helper functions for dpatch
+##
+
+# dpatch_patch_template <args> <patchname> [<desc>]
+dpatch_patch_template ()
+{
+	local pname pdesc o_p
+
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				dpatch_help_do patch-template
+				return $?
+				;;
+			--prepend|-p)
+				o_p=1
+				;;
+			-*)
+				echo "dpatch: Invalid option for dpatch_patch_template: $1" >&2
+				return 1
+				;;
+			*)
+				break
+				;;
+		esac
+		shift || true
+	done
+
+	pname=${1:-99-unnamed}
+	pdesc=${2:-No description.}
+
+	cat <<EOF
+#! /bin/sh /usr/share/dpatch/dpatch-run
+## ${pname}.dpatch by ${DEBFULLNAME} <${DEBEMAIL:-${EMAIL:-$LOGNAME@`hostname -f`}}>
+##
+## All lines beginning with \`## DP:' are a description of the patch.
+EOF
+	echo "${pdesc}" | fold -s -w 72 | sed -e "s,^,## DP: ,g"
+
+	cat <<EOF
+
+@DPATCH@
+EOF
+
+	if [ ! -z "${o_p}" ]; then
+		echo
+		cat
+	fi
+
+	return 0
+}
+
+# arch-tag: ac9769b8-8759-4fee-a0d7-fc49e0bcdbf5

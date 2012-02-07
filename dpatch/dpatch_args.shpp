@@ -1,0 +1,68 @@
+## dpatch_args.shpp				-*- shell-script -*-
+##
+## Argument handling helper functions for dpatch.
+##
+
+# dpatch_args_check <cmd_help> <argc> <minimumargs> <maxargs>
+dpatch_args_check ()
+{
+	local minargs maxargs argc ch
+
+	ch=$1
+	argc=$2
+	minargs=$3
+	maxargs=$4
+
+	if [ $ch -eq 1 ]; then
+		return 0
+	fi
+	if test ${argc} -gt ${maxargs} && test ${maxargs} -ne -1; then
+		echo "dpatch: Wrong number of arguments: ${argc} (expecting at most ${maxargs})." >&2
+		exit 1
+	fi
+	if test ${argc} -lt ${minargs} && test ${minargs} -ne -1; then
+		echo "dpatch: Wrong number of arguments: ${argc} (expecting at least ${minargs})." >&2
+		exit 1
+	fi
+}
+
+# dpatch_arg_count <args>
+dpatch_arg_count ()
+{
+	local argc h
+
+	argc=0
+	while [ $# -ne 0 ]; do
+		case $1 in
+			-*)
+				;;
+			*)
+				argc=$(expr ${argc} + 1)
+				;;
+		esac
+		shift || true
+	done
+
+	echo ${argc}
+	return 0
+}
+
+# dpatch_arg_cmd_help <args>
+dpatch_arg_cmd_help ()
+{
+	local h=0
+
+	while [ $# -ne 0 ]; do
+		case $1 in
+			--help|-h)
+				h=1
+				;;
+		esac
+		shift || true
+	done
+
+	echo ${h}
+	return 0;
+}
+
+## arch-tag: e31ccb46-5f55-40fd-8678-3b9fd7ff0581

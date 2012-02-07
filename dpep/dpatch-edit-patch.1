@@ -1,0 +1,376 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH DPATCH-EDIT-PATCH 1 "23 Oct 2011" DPATCH "dpatch users manual"
+.SH NAME
+dpatch\-edit\-patch \- maintain dpatch patches for a Debian source package
+.SH SYNOPSIS
+.B dpatch\-edit\-patch [\fIoptions\fP] command \fIdpatchname\fP [\fIbasepatch\fP]
+.SH DESCRIPTION
+This manual documents the
+.B "dpatch\-edit\-patch"
+command which maintains dpatch patches for a dpatch-using Debian
+source package.
+
+.B "dpatch\-edit\-patch"
+will copy the full tree to a temporary directory for working.
+
+.SH WARNING
+.B dpatch
+is deprecated, please switch to the `3.0 (quilt)' Debian source
+package format instead. See
+.I http://wiki.debian.org/Projects/DebSrc3.0#FAQ
+for a short guide on how to do it.
+
+.SH OPTIONS
+.B "dpatch\-edit\-patch"
+takes two forms of arguments; options and commands.
+Currently, the only command that exists is \(lqpatch\(rq, which allows you to
+create/edit dpatches.
+When no command is given, \(lqpatch\(rq is assumed.
+
+.SS COMMANDS:
+.TP
+.I patch
+This command requires one mandatory argument, and accepts one optional
+argument under certain circumstances.
+The mandatory argument is
+.IR "dpatchname" .
+This refers to a dpatch, as it would be listed in
+.IR "debian/patches/00list" .
+It is not necessary for
+.I "dpatchname"
+to exist prior to running
+.B "dpatch\-edit\-patch" "patch"
+.IR "dpatchname" .
+
+When 
+.I dpatchname
+exists,
+.B dpatch\-edit\-patch
+will set up a working source tree, apply all dpatches listed in
+.I debian/patches/00list
+up to and including
+.IR dpatchname ,
+and spawn an interactive shell for the developer. The developer then
+edits files in this working tree. When the developer is done, they
+exit the shell.
+.B dpatch\-edit\-patch
+then updates \fIdpatchname\fP to reflect the changes made.
+Should the developer wish to abort the process from the interactive shell, they
+need only cause the shell to exit with an exit value of 230.
+Typically, this is done by exiting the shell with the command
+.BR "exit 230" .
+
+Would the developer wish to see the patch one's currently works on
+without exiting the subshell, two environment variables are exported
+into the subshell to help with this: \fBDPEP_SHELL_REFDIR\fR, which is
+set to the reference directory's full name, and
+\fBDPEP_SHELL_WORKDIR\fR, which is set to the subshell's working
+directory.
+
+These two can be used to \- for example \- generate a diff between the
+reference version and the current tree:
+
+.RS
+.RS
+.I diff -urNa \fB$DPEP_SHELL_REFDIR\fR \fB$DPEP_SHELL_WORKDIR\fR
+.RE
+.RE
+
+When \fIdpatchname\fR does not exist,
+.B dpatch\-edit\-patch
+will assume that a new dpatch should be created. As with the above
+scenario,
+.B dpatch\-edit\-patch
+first creates a working source tree. If the optional argument
+.I basepatch
+is supplied, all dpatches in
+.I debian/patches/00list
+up to and including
+.I basepatch
+will be applied to the working tree.
+If
+.I basepatch
+is not supplied, no dpatches are applied to the working tree.  When
+then developer exits the shell,
+.B dpatch\-edit\-patch
+will create
+.I dpatchname\fP.
+If
+.I debian/patches/00template
+does not exist, a hardcoded dpatch header and shell snippet will be
+used. If it exists and is not executable, it will be copied verbatim
+as the header and shell snippet.
+
+Its first parameter is the base filename of the
+.IR to\-be\-updated " or " to\-be\-created
+dpatch (useful for adding titles to the dpatch header). Its second
+parameter will be the description of the new patch.
+.SS OPTIONS
+For the following options, command\-line arguments take precedence over
+environment variables, which take precedence over configuration
+variables. Configuration variables are read from
+\fIdebian/patches/00dpatch.conf\fR and \fI~/.dpatch.conf\fR.
+.TP 
+.IB "\-s, \-\-sourcedir=" value
+Directory containing unpacked Debian source package.
+Configuration variable \fBconf_sourcedir\fR (settable only in
+\fI~/.dpatch.conf\fR), environment variable \fBDPEP_SOURCEDIR\fR.
+Defaults to the current working directory.
+.TP
+.IB "\-o, \-\-outdir="value
+Directory where the updated or newly-created dpatch will be placed.
+Configuration variable \fBconf_outdir\fR (\fI~/.dpatch.conf\fR), environment
+variable \fBDPEP_OUTDIR\fR. Defaults to
+.I ./debian/patches/
+.TP
+.IB "\-c, \-\-clean"
+Indicate to
+.B dpatch\-edit\-patch
+that the current work directory can safely be cleaned. If not given,
+.B dpatch\-edit\-patch
+tries to preserve partial or complete builds by first copying the
+current work directory to a reference directory before invoking
+\fIdebian/rules\fR clean on the reference directory. If given, the
+current directory is cleaned and then taken as a reference
+directory. Use this option if your source package is pretty large and
+no significant work is destroyed by cleaning. Configuration variable
+\fBconf_clean\fR (\fI~/.dpatch.conf\fR), Environment variable \fBDPEP_CLEAN\fR.
+.TP
+.IB "\-b, \-\-debianonly[="path]
+Indicate to 
+.B dpatch\-edit\-patch
+that the current work directory only contains a debian subdirectory
+and that an upstream tarball is to be unpacked in the reference
+directory before copying the current work directory there. The
+optional argument is the path to the upstream tarball - including the
+tarball name. If no value is given,
+.B dpatch\-edit\-patch
+will use the hook script pointed to by \fBconf_getorigtargz\fR
+(\fI~/.dpatch.conf\fR) or \fBDPEP_GETORIGTARGZ\fR to obtain the
+upstream tarball. The hook script should take one argument: the
+destination directory where the fetched archive shall be put.
+Configuration variables: \fBconf_debianonly\fR (\fIdebian/patches/00dpatch.conf\fR)
+and \fBconf_origtargz\fR (\fI~/.dpatch.conf\fR), Environment Variables
+\fBDPEP_DEBIANONLY\fR and \fBDPEP_ORIGTARGZ\fR.
+.TP
+.IB "\-P, \-\-origtargzpath="path
+When
+.IB \-b
+is in use, specify the path where upstream tarballs should be looked for.
+.B path
+is a colon-separated list of directories.
+Configuration variables: \fBconf_origtargzpath\fR (\fI~/.dpatch.conf\fR),
+Environment Variables \fBDPEP_ORIGTARGZPATH\fR.
+.TP
+.IB "\-r, \-\-rootcmd="value
+Command used to gain root privileges used to clean DPEP_SOURCEDIR.
+Configuration variable \fBconf_rootcmd\fR, environment variable \fBDPEP_ROOTCMD\fR.
+Defaults to \fBfakeroot\fR, if installed.
+If none of the above are specified, and fakeroot is not installed,
+.B dpatch\-edit\-patch
+will abort.
+The dpatch authors strongly recommend the use of fakeroot for this purpose.
+.TP
+.IB "\-d, \-\-description="value
+Description used for a newly-created patch.
+Configuration variable \fBconf_newdesc\fR (\fI~/.dpatch.conf\fR), environment variable
+\fBDPEP_NEWDESC\fR, defaults to
+.I \(lqNo description.\(rq
+.TP
+.IB "\-k, \-\-keeptemp="value
+Boolean value, either \fI0\fR or \fI1\fR.
+Configuration variable \fBconf_keeptemp\fR (\fI~/.dpatch.conf\fR), environment variable
+\fBDPEP_KEEPTEMP\fR. When set to \fI1\fR, temporary working tree is not
+deleted when
+.B dpatch\-edit\-patch
+is done.
+.TP
+.IB "\-t, \-\-tmpdir="value
+Temporary directory within which
+.B dpatch\-edit\-patch
+will create the working source tree.
+Configuration variable \fBconf_tmpdir\fR (\fI~/.dpatch.conf\fR), environment variable
+\fBDPEP_TMPDIR\fR. Should none of the above be set,
+.B dpatch\-edit\-patch
+will first attempt to use the environment variable \fBTMPDIR\fR, and
+will fall back to
+.IR /tmp .
+.TP
+.IB "\-p, \-\-stampdir="value
+The directory 
+.B dpatch
+has used for creating patch stamps.
+Used for checking if patch to be edited is already applied 
+to the working tree.
+Configuration variable \fBconf_stampdir\fR (\fI~/.dpatch.conf\fR), environment variable
+\fBDPEP_STAMPDIR\fR. Should none of the above be set,
+.B dpatch\-edit\-patch
+will fall back to
+.B debian/patched
+.TP
+.IB "\-e, \-\-exclude="valuelist
+Space-separated list of file- and directory names that
+.B dpatch\-edit\-patch
+will exclude from being copied and diffed.
+Configuration variable \fBconf_exclude\fR (\fI~/.dpatch.conf\fR), environment variable
+\fBDPEP_EXCLUDE\fR. Defaults to "CVS .svn .git .arch .hg _darcs .bzr", which might cause you
+trouble if you use files named like that in your package.
+.TP
+.IB "\-O, \-\-diffopts="valuelist
+Extra options to directly pass to
+.B diff
+as-is.
+Configuration variable \fBconf_diffopts\fR (\fI~/.dpatch.conf\fR),
+environment variable \fBDPEP_DIFF_OPTIONS\fR. It is empty by default.
+.TP
+.IB "\-l, \-\-shell="shell
+Tell
+.B dpatch\-edit\-patch
+which shell to invoke. Configuration variable \fBconf_shell\fR
+(\fI~/.dpatch.conf\fR), environment variable \fBDPEP_SHELL\fR, defaulting to
+$SHELL and the user's default shell.
+.TP
+.IB "\-n, \-\-notimestamp"
+Tell
+.B dpatch\-edit\-patch
+to remove timestamps from the diffs it generates. Can also be set in
+\fIdebian/patches/00options\fR, with the \fBDPEP_OMIT_TIMESTAMPS\fR
+variable.
+.TP
+.IB "\-0, \-\-add2list"
+add the new patch to 00list file.
+.TP
+.IB "\-a, \-\-applyall"
+apply all available patches.
+
+.SH "EXAMPLES"
+.SS Create a new patch to be applied after an existing patch.
+To create a new patch, to be applied after an existing patch 90_ctrlkeyfix:
+.PP
+$
+.B dpatch\-edit\-patch patch 95_newupstreamfix 90_ctrlkeyfix
+.nf
+dpatch\-edit\-patch: * debian/patches/95_newupstreamfix.dpatch does not exist, it will be created as a new dpatch.
+dpatch\-edit\-patch: * Cleaning /home/david/temp/sopwith\-1.6.0
+ ...
+dpatch\-edit\-patch: * Applying patches
+dpatch\-edit\-patch: ** Applying patch 90_ctrlkeyfix ... applied cleanly.
+dpatch\-edit\-patch: * Copying /home/david/temp/sopwith\-1.6.0 to work directory.
+ ...
+.fi
+.ad
+$
+.B editor files
+.br
+$
+.B exit 0
+.nf
+dpatch\-edit\-patch: * Creating new patch debian/patches/95_newupstreamfix.dpatch
+dpatch\-edit\-patch: Warning: debian/patches/00template does not exist, using hardcoded default.
+dpatch\-edit\-patch: debian/patches/95_newupstreamfix.dpatch created.
+.fi
+.ad
+.PP
+.SS Create a new patch not depending on existing patches
+To create a new patch, intended to be applied before any other patches (or a new
+patch which doesn't require other patches to be applied first):
+.PP
+$
+.B dpatch\-edit\-patch 10_debianstrings
+.nf
+dpatch\-edit\-patch: * debian/patches/10_debianstrings.dpatch does not exist, it will be created as a new dpatch.
+dpatch\-edit\-patch: * Cleaning /home/david/temp/sopwith\-1.6.0
+ ...
+dpatch\-edit\-patch: Warning: * No base-patch supplied, not applying any patches.
+dpatch\-edit\-patch: * Copying /home/david/temp/sopwith\-1.6.0 to work directory.
+ ...
+.fi
+.ad
+$
+.B editor files
+.br
+$
+.B exit 0
+.nf
+ ...
+dpatch\-edit\-patch: * Creating new patch debian/patches/10_debianstrings.dpatch
+dpatch\-edit\-patch: Warning: debian/patches/00template does not exist, using hardcoded default.
+dpatch\-edit\-patch: debian/patches/10_debianstrings.dpatch created.
+.fi
+.ad
+.PP
+.SS Edit an existing patch:
+.PP
+$
+.B dpatch\-edit\-patch 10_debianstrings
+.nf
+dpatch\-edit\-patch: * debian/patches/10_debianstrings.dpatch exists, this patch will be updated.
+dpatch\-edit\-patch: * Cleaning /home/david/temp/sopwith\-1.6.0
+ ...
+dpatch\-edit\-patch: * Applying patches
+dpatch\-edit\-patch: * Copying /home/david/temp/sopwith\-1.6.0 to work directory.
+dpatch\-edit\-patch: * Applying current 10_debianstrings for editing.
+ ...
+.fi
+.ad
+$
+.B editor files
+.br
+$
+.B exit 0
+.nf
+dpatch\-edit\-patch: Updating patch debian/patches/10_debianstrings.dpatch
+dpatch\-edit\-patch: @DPATCH@ tag found, preserving dpatch header.
+dpatch\-edit\-patch: debian/patches/10_debianstrings.dpatch updated.
+.fi
+.ad
+
+.SH NOTES
+.B dpatch\-edit\-patch
+uses the \fBDEBFULLNAME\fR environment variable as the author's
+name. If it is unset, the author name will be left blank.
+.PP
+.B dpatch\-edit\-patch
+determines the author's email address for new patches using
+the following algorithm:
+.br
+1) Should the \fBDEBEMAIL\fR environment variable exist, it is always used.
+.br
+2) If the \fBEMAIL\fR environment variable exists, it will be used when
+\fBDEBEMAIL\fR does not exist.
+.br
+3) Should neither of the first two attempts succeed, the email will be
+constructed using the login name of the user running
+.B dpatch\-edit\-patch
+combined with the output of \fBhostname \-f\fR.
+.PP
+When
+.B dpatch\-edit\-patch
+sets up a reference or a working directory, it dereferences all
+symlinks in the source. That allows relative links to continue
+working, and allows changes only to a single file and not to the
+linked file and the link target. If you use
+.B dpatch\-edit\-patch
+on source trees that have symbolic links, you might end up with a
+patch that is unapplyable to the original tree.
+
+.SH FILES
+.IR debian/patches/00dpatch.conf ,
+.IR ~/.dpatch.conf .
+
+.SH "SEE ALSO"
+.BR "dpatch" "(1), "
+.BR "dpatch" "(7), "
+.BR "dpatch.make" "(7), "
+.BR "dpatch\-list\-patch" "(1), "
+.BR "dpatch\-convert\-diffgz" "(1)"
+
+.RI "Files in " "/usr/share/doc/dpatch/"
+
+.SH "AUTHOR"
+This manual page was written by David B Harris <david@eelf.ddts.net>
+and modified in the course of development by Gergely Nagy <algernon@debian.org>,
+Marc Haber <mh+debian\-packages@zugschlus.de>, Stefano Zacchiroli <zack@debian.org>, 
+and Junichi Uekawa <dancer@debian.org>.
+
+

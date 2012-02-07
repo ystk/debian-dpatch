@@ -1,0 +1,145 @@
+.\" -*- nroff -*-
+.\" This manual is for dpatch, a patch maintenance system for Debian.
+.\" It documents the dpatch.make compatibility wrapper.
+.\" 
+.\" Copyright (C) 2003 Gergely Nagy <algernon@bonehunter.rulez.org>
+.\" Copyright (C) 2007 Junichi Uekawa <dancer@debian.org>
+.\"
+.\" Permission is granted to make and distribute verbatim copies of this
+.\" manual provided the copyright notice and this permission notice are
+.\" preserved on all copies.
+.\"
+.\" Permission is granted to copy and distribute modified versions of this
+.\" manual under the conditions for verbatim copying, provided that the
+.\" entire resulting derived work is distributed under the terms of a
+.\" permission notice identical to this one.
+.\"
+.\" Permission is granted to copy and distribute translations of this
+.\" manual into another language, under the above conditions for modified
+.\" versions, except that this permission notice may be stated in a
+.\" translation approved by the Author.
+.TH DPATCH.MAKE 7 "Dec 13 2011" "DPATCH 2" "dpatch"
+.SH "NAME"
+dpatch.make \- simplistic wrapper around \fBdpatch\fR(1) for \fBmake\fR(1).
+
+.SH "SYNOPSIS"
+.BI include " /usr/share/dpatch/dpatch.make"
+
+.SH "DESCRIPTION"
+For backwards compatibility and ease of use, \fIdpatch.make\fR is
+provided along with \fBdpatch\fR(1). Its purpose is to implement
+generic \fBpatch\fR and \fBunpatch\fR rules that can be reused in
+\fIdebian/rules\fR scripts.
+
+.SH WARNING
+.B dpatch
+is deprecated, please switch to the `3.0 (quilt)' Debian source
+package format instead. See
+.I http://wiki.debian.org/Projects/DebSrc3.0#FAQ
+for a short guide on how to do it.
+
+.SH "USAGE"
+Using \fIdpatch.make\fR is rather straightforward: one has to include
+the file in \fIdebian/rules\fR, change the appropriate targets to
+depend on \fBpatch\fR and \fBunpatch\fR, and that is all it takes.
+
+Figuring out what the appropriate target is, requires some
+thought. Generally, one has a \fBbuild\fR target, or
+\fBconfig.status\fR, or \fBconfigure\fR (or any of these with a
+\fB\-stamp\fR suffix). Most of the time these are called first during
+the build, so one of these (the one that exists, and is not depended
+upon by another one) has to be modified to depend on the \fBpatch\fR
+target in \fIdpatch.make\fR.
+
+Doing the same for the \fBclean\fR target is easier. One only has to
+rename the old rule to, say, \fBclean\-patched\fR, then make a new one
+that has \fBclean\-patched\fR and \fBunpatch\fR in its list of
+prerequisites.
+
+.SH "CUSTOMISATION"
+
+There are a few variables which are used by \fIdpatch.make\fR, which
+can be set before including it, in order to change the systems
+behaviour a little.
+
+These variables are:
+
+.RS
+.B DEB_SOURCE_PACKAGE
+.RS
+This is the name of the source package, used when creating the stamp
+file. By default, it is empty.
+.RE
+.B DPATCH_STAMPDIR
+.RS
+This is the directory where stamp files will be put. Default is
+\fIdebian/patched\fR.
+.RE
+.B DPATCH_STAMPFN
+.RS
+The name of the stamp file, which contains the patch descriptions and
+other possible meta\-data. Default value is \fIpatch\-stamp\fR.
+.RE
+.B DPATCH_PREDEPS
+.RS
+A list of make targets to call before applying the dpatch.
+.RE
+.B DPATCH_WORKDIR
+.RS
+The target directory to apply patches to. By default, it is the
+current directory.
+.RE
+.B PATCHLIST
+.RS
+The list of patches to apply. This is an alternative to
+\fIdebian/patches/00list\fR \- that is, if this variable is not empty,
+the contents of \fI00list\fR will be ignored, and this variable will
+be used instead.
+.RE
+.RE
+
+.SH "EXAMPLE"
+
+.RS
+.sp
+.nf
+ include /usr/share/dpatch/dpatch.make
+
+ build: build-stamp
+ build-stamp: patch-stamp
+	${MAKE}
+	touch build-stamp
+
+ clean: clean1 unpatch
+ clean1:
+	${MAKE} clean
+	rm \-rf debian/files debian/substvars debian/imaginary\-package
+
+ .PHONY: patch unpatch ...
+	.
+	.
+	.
+.fi
+.sp
+.RE
+
+.SH "SIDE EFFECTS"
+Using \fIdpatch.make\fR instead of calling dpatch directly has one
+side effect: it will create a file called \fIpatch\-stamp\fR
+containing some meta\-information extracted from the scriptlets.
+
+Depending on a phony \fIpatch\fR target directly from \fIbuild\fR
+target may cause \fIbuild\fR target to be reevaluated even when there
+is no change to be done. Instead, try making \fIbuild-stamp\fR depend
+on \fIpatch-stamp\fR as specified in this example.
+
+.SH "AUTHOR"
+Originally by Gergely Nagy.
+Modified by Junichi Uekawa.
+
+.SH "SEE ALSO"
+.BR "dpatch" "(1), "
+.BR "dpatch" "(7), "
+.BR "dpatch\-edit\-patch" "(1), "
+.BR "dpatch\-list\-patch" "(1), "
+.BR "dpatch\-convert\-diffgz" "(1)"

@@ -1,0 +1,45 @@
+   Check that modifying of patch file works.
+
+dpatch deapply-all
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+dpatch-edit-patch: * /tmp/XXXX/dpatch-test/debian/patches/01_edpatch.dpatch exists, this patch will be updated.
+dpatch-edit-patch: * Copying /tmp/XXXX/dpatch-test to reference directory.
+dpatch-edit-patch: * Cleaning /tmp/XXXX/dpatch-test
+--- Cleaning
+dh_testdir
+dh_testroot
+dh_clean -k
+dh_clean: dh_clean -k is deprecated; use dh_prep instead
+dh_clean: Compatibility levels before 5 are deprecated.
+dpatch deapply-all
+01_edpatch not applied to ./ .
+rm -rf patch-stamp debian/patched
+make: Nothing to be done for `unpatch'.
+01_edpatch not applied to ./ .
+dpatch-edit-patch: * Applying patches
+dpatch-edit-patch: * Copying reference directory /tmp/XXXX/dpatch-test to work directory.
+dpatch-edit-patch: * Applying current 01_edpatch.dpatch for editing.
+applying patch 01_edpatch to ./ ... ok.
+
+dpatch-edit-patch:
+
+Now launching an interactive shell in your work directory. Edit your files.
+When you are done, exit the shell. When you exit the shell, your patch will be
+automatically updated based on the changes in your work directory.
+
+If you wish to abort the process, exit the shell such that it returns an exit
+code of "230". This is typically done by exiting the shell with the command
+'exit 230'.
+dpatch-edit-patch: Updating patch /tmp/XXXX/dpatch-test/debian/patches/01_edpatch.dpatch
+dpatch-edit-patch: @DPATCH@ tag found, preserving dpatch header.
+dpatch-edit-patch: /tmp/XXXX/dpatch-test/debian/patches/01_edpatch.dpatch updated.
+dpatch apply-all
+applying patch 01_edpatch to ./ ... ok.
+dpatch cat-all >patch-stamp
+touch patch-stamp
+=== check file one1 contains the right content
+dpatch deapply-all
+reverting patch 01_edpatch from ./ ... ok.
+rm -rf patch-stamp debian/patched
+=== check file one1 does not exist

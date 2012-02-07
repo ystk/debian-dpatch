@@ -1,0 +1,66 @@
+HOWTO use dpatch with a debian/-only VCS layout
+===============================================
+
+This HOWTO has been primarily written for users of svn-buildpackage in
+mergeWithUpstream mode. In this case, normally only the debian/- directory and
+patches (normally in debian/patches/) are stored under VCS-control. This setup
+does not include the complete package source.
+
+However, dpatch already can handle this layout perfectly via the -b swtich.
+Optional to this switch you can give the full path to the .orig.tar.gz
+tarball, e.g.:
+
+$ dpatch-edit-patch -b /usr/local/src/foo/foo-1.0.tar.gz
+
+If you do not provide the tarball, dpatch tries to call the hook
+script set in conf_getorigtargz (in $HOME/.dpatch.conf) or in the
+DPEP_GETORIGTARGZ environment variable. See the dpatch-edit-patch
+manual for the exact steps taken.
+
+Using the first option, you can configure dpatch to look at the "right" place
+by defining conf_origtargzpath in ${HOME}/.dpatch.conf. Say for example your
+sources always reside in /usr/local/src/packages/${PACKAGE}, then add the
+following to your .dpatch.conf (BASH syntax!)
+
+/---- .dpatch.conf -----------------------------------------------------------
+# the following is necessary, because dpatch maybe determines the variables
+# too late
+PACKAGENAME="$(dpkg-parsechangelog | \
+	sed -n '/^Source:/{s/^Source:[[:space:]]\+\(.*\)/\1/;p;q}')"
+UPSTREAMVERSION="$(dpkg-parsechangelog | \
+	sed -n '/^Version:/{s/^Version:[[:space:]]\+\([0-9]\+:\)\?\([^-]\+\).*/\2/;p;q}')"
+
+# simply adjust the following variable for your needs
+conf_origtargzpath="/usr/local/src/packages/${PACKAGENAME}"
+\-----------------------------------------------------------------------------
+
+Maybe you have different locations, because you are part of several projects.
+In this case, you can do the following:
+
+/---- .dpatch.conf -----------------------------------------------------------
+# the following is necessary, because dpatch maybe determines the variables
+# too late
+PACKAGENAME="$(dpkg-parsechangelog | \
+	sed -n '/^Source:/{s/^Source:[[:space:]]\+\(.*\)/\1/;p;q}')"
+UPSTREAMVERSION="$(dpkg-parsechangelog | \
+	sed -n '/^Version:/{s/^Version:[[:space:]]\+\([0-9]\+:\)\?\([^-]\+\).*/\2/;p;q}')"
+
+# simply adjust the following test and variable for your needs
+if [[ `pwd` =~ '^.*/debian-med/trunk/packages/.*$' ]]
+then
+	conf_origtargzpath="/usr/local/src/packages/debian-med/trunk/packages/${PACKAGENAME}"
+else
+	conf_origtargzpath="/usr/local/src/packages/${PACKAGENAME}"
+fi
+\-----------------------------------------------------
+
+So you simply run
+
+$ dpatch-edit-patch -b
+
+in your VCS copy and dpatch automatically figures out the correct place to
+look for the upstream tarball.
+
+ -- Daniel Leidert, January 2008
+
+# vim:tw=78

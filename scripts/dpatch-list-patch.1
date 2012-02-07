@@ -1,0 +1,44 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.TH DPATCH-LIST-PATCH 1 "Dec 13, 2011" DPATCH
+.SH NAME
+dpatch-list-patch \- List available patches
+.SH SYNOPSIS
+.B dpatch\-list\-patch
+.RI [ options ]
+.SH DESCRIPTION
+This manual page documents briefly the
+.B dpatch\-list\-patch
+command which simply lists the available patches in a dpatch-based
+source tree together with their accompanying comments.
+
+.SH WARNING
+.B dpatch
+is deprecated, please switch to the `3.0 (quilt)' Debian source
+package format instead. See
+.I http://wiki.debian.org/Projects/DebSrc3.0#FAQ
+for a short guide on how to do it.
+
+.SH OPTIONS
+Without any options dpatch\-list\-patch will list the patches in the
+current source tree.
+.TP
+.B \-s, \-\-sourcedir
+Source directory. Defaults to \fI.\fR
+.TP
+.B \-h, \-\-help
+Show summary of options.
+
+.SH "SEE ALSO"
+.BR "dpatch" "(1), "
+.BR "dpatch" "(7), "
+.BR "dpatch.make" "(7), "
+.BR "dpatch\-edit\-patch" "(1), "
+.BR "dpatch\-convert\-diffgz" "(1)"
+
+.RI "Files in " "/usr/share/doc/dpatch/"
+.SH AUTHOR
+dpatch\-list\-patch was written by Junichi Uekawa <dancer@debian.org>.
+.br
+This manual page was written by Gergely Nagy <algernon@debian.org>.
+
+.\" arch-tag: a6567a76-6d0a-4d13-ae6d-a91a7fda0e82
